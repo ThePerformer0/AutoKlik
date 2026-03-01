@@ -1,0 +1,399 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AutoKlik — Garage Expert à Yaoundé{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}AutoKlik, votre garage automobile de confiance à Yaoundé. Services de qualité, prix transparents et prise de rendez-vous en ligne.{% endblock %}">
+
+    <!-- Fonts : Barlow Condensed (titres forts) + DM Sans (lecture) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forge: {
+                            50:  '#fff7ed',
+                            100: '#ffedd5',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        },
+                        iron: {
+                            50:  '#f8f8f7',
+                            100: '#f0efee',
+                            200: '#dddcda',
+                            400: '#a09e9b',
+                            600: '#6b6966',
+                            800: '#2e2d2b',
+                            900: '#1a1917',
+                            950: '#0d0c0b',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['"Barlow Condensed"', 'sans-serif'],
+                        body:    ['"DM Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <style>
+        * { font-family: 'DM Sans', sans-serif; }
+        h1, h2, h3, h4, h5, .font-display { font-family: 'Barlow Condensed', sans-serif; }
+
+        /* Texture de fond subtile — grille mécanique */
+        body {
+            background-color: #0d0c0b;
+            background-image:
+                linear-gradient(rgba(249,115,22,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(249,115,22,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Ligne décorative orange animée sous le nav */
+        .nav-accent-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #f97316, #ea580c, transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* Lien nav actif */
+        .nav-link {
+            position: relative;
+            letter-spacing: 0.08em;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: #a09e9b;
+            transition: color 0.2s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #f97316;
+            transition: width 0.25s ease;
+        }
+        .nav-link:hover { color: #f8f8f7; }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Bouton RDV principal */
+        .btn-rdv {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.6rem 1.4rem;
+            background: #f97316;
+            color: #0d0c0b;
+            border: none;
+            position: relative;
+            clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-rdv:hover {
+            background: #ea580c;
+            transform: translateY(-1px);
+        }
+
+        /* Séparateur décoratif avec losange */
+        .divider-diamond::before,
+        .divider-diamond::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #2e2d2b);
+        }
+        .divider-diamond::after {
+            background: linear-gradient(90deg, #2e2d2b, transparent);
+        }
+
+        /* Toast messages */
+        .toast-success { background: #052e16; border-left: 3px solid #16a34a; color: #bbf7d0; }
+        .toast-info    { background: #0c1a2e; border-left: 3px solid #f97316; color: #fed7aa; }
+        .toast-error   { background: #2d0a0a; border-left: 3px solid #dc2626; color: #fecaca; }
+
+        /* Footer texture */
+        .footer-noise {
+            background-color: #0a0908;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230a0908'/%3E%3Crect x='0' y='0' width='1' height='1' fill='%23141311' opacity='0.6'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23141311' opacity='0.6'/%3E%3C/svg%3E");
+        }
+
+        /* Scroll bar custom */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0d0c0b; }
+        ::-webkit-scrollbar-thumb { background: #2e2d2b; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+
+        /* Animation entrée page */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        main { animation: fadeUp 0.4s ease both; }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="text-iron-100 flex flex-col min-h-screen">
+
+    <!-- ═══════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════ -->
+    <header class="sticky top-0 z-50">
+        <!-- Bandeau très fin au-dessus -->
+        <div class="bg-iron-950 border-b border-iron-800 px-4 py-1.5 hidden md:flex items-center justify-between text-xs text-iron-400">
+            <span class="tracking-widest uppercase font-display text-xs">
+                Garage Automobile · Yaoundé, Cameroun
+            </span>
+            <div class="flex items-center gap-6">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    Lun–Sam : 7h–18h
+                </span>
+                <a href="tel:+237655123456" class="hover:text-forge-400 transition-colors tracking-wider">
+                    +237 6 55 12 34 56
+                </a>
+            </div>
+        </div>
+
+        <!-- Nav principale -->
+        <nav class="bg-iron-950/95 backdrop-blur-sm border-b border-iron-800/60 px-4">
+            <div class="max-w-7xl mx-auto flex items-center justify-between h-16">
+
+                <!-- Logo -->
+                <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+                    <!-- Icône clé stylisée -->
+                    <div class="w-8 h-8 border border-forge-600 flex items-center justify-center rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                        <svg class="w-4 h-4 text-forge-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3-3a1 1 0 000-1.4l-1.6-1.6a1 1 0 00-1.4 0l-3 3z"/>
+                            <path d="M13 8L4 17v3h3l9-9"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="font-display text-xl font-bold tracking-wider text-iron-50">AUTO</span><span class="font-display text-xl font-bold tracking-wider text-forge-500">KLIK</span>
+                    </div>
+                </a>
+
+                <!-- Menu desktop -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="{% url 'home' %}"        class="nav-link">Accueil</a>
+                    <a href="{% url 'services' %}"    class="nav-link">Services</a>
+                    <a href="{% url 'about' %}"       class="nav-link">À propos</a>
+                    <a href="{% url 'contact' %}"     class="nav-link">Contact</a>
+
+                    <!-- Séparateur vertical -->
+                    <span class="w-px h-5 bg-iron-700"></span>
+
+                    <a href="{% url 'appointment' %}" class="btn-rdv">
+                        Prendre RDV
+                    </a>
+                </div>
+
+                <!-- Burger mobile -->
+                <button
+                    id="burger-btn"
+                    class="md:hidden flex flex-col gap-1.5 p-2 group"
+                    onclick="document.getElementById('mobile-menu').classList.toggle('translate-x-full')"
+                    aria-label="Menu">
+                    <span class="w-6 h-px bg-iron-300 group-hover:bg-forge-500 transition-colors"></span>
+                    <span class="w-4 h-px bg-iron-300 group-hover:bg-forge-500 transition-colors"></span>
+                    <span class="w-6 h-px bg-iron-300 group-hover:bg-forge-500 transition-colors"></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Ligne shimmer orange -->
+        <div class="nav-accent-line"></div>
+    </header>
+
+    <!-- Menu mobile (drawer latéral) -->
+    <div id="mobile-menu"
+         class="fixed inset-y-0 right-0 z-[100] w-72 bg-iron-950 border-l border-iron-800 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="flex items-center justify-between p-5 border-b border-iron-800">
+            <span class="font-display text-lg font-bold text-iron-50">AUTO<span class="text-forge-500">KLIK</span></span>
+            <button
+                onclick="document.getElementById('mobile-menu').classList.add('translate-x-full')"
+                class="text-iron-400 hover:text-iron-50 transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="flex flex-col p-6 gap-1 flex-grow">
+            {% url 'home' as url_home %}
+            {% url 'services' as url_services %}
+            {% url 'about' as url_about %}
+            {% url 'contact' as url_contact %}
+
+            <a href="{{ url_home }}"     class="flex items-center gap-3 py-3 text-iron-300 hover:text-forge-400 border-b border-iron-800/50 transition-colors font-display text-lg tracking-wide uppercase">
+                <span class="text-forge-700 font-display text-sm">01</span> Accueil
+            </a>
+            <a href="{{ url_services }}" class="flex items-center gap-3 py-3 text-iron-300 hover:text-forge-400 border-b border-iron-800/50 transition-colors font-display text-lg tracking-wide uppercase">
+                <span class="text-forge-700 font-display text-sm">02</span> Services
+            </a>
+            <a href="{{ url_about }}"    class="flex items-center gap-3 py-3 text-iron-300 hover:text-forge-400 border-b border-iron-800/50 transition-colors font-display text-lg tracking-wide uppercase">
+                <span class="text-forge-700 font-display text-sm">03</span> À propos
+            </a>
+            <a href="{{ url_contact }}"  class="flex items-center gap-3 py-3 text-iron-300 hover:text-forge-400 border-b border-iron-800/50 transition-colors font-display text-lg tracking-wide uppercase">
+                <span class="text-forge-700 font-display text-sm">04</span> Contact
+            </a>
+        </nav>
+
+        <div class="p-6">
+            <a href="{% url 'appointment' %}" class="btn-rdv block text-center w-full py-3">
+                Prendre rendez-vous
+            </a>
+            <p class="text-iron-600 text-xs text-center mt-4 tracking-widest uppercase">
+                +237 6 55 12 34 56
+            </p>
+        </div>
+    </div>
+
+    <!-- Overlay mobile menu -->
+    <div id="mobile-overlay"
+         class="hidden fixed inset-0 z-[99] bg-black/60 backdrop-blur-sm"
+         onclick="document.getElementById('mobile-menu').classList.add('translate-x-full'); this.classList.add('hidden')">
+    </div>
+
+    <script>
+        // Ouvre l'overlay quand le burger est cliqué
+        document.getElementById('burger-btn').addEventListener('click', function() {
+            document.getElementById('mobile-overlay').classList.remove('hidden');
+        });
+    </script>
+
+    <!-- ═══════════════════════════════════════
+         MESSAGES DJANGO
+    ═══════════════════════════════════════ -->
+    {% if messages %}
+    <div class="max-w-4xl mx-auto px-4 mt-6 space-y-3">
+        {% for message in messages %}
+        <div class="flex items-start gap-3 px-4 py-3 rounded text-sm
+            {% if message.tags == 'success' %}toast-success
+            {% elif message.tags == 'error' %}toast-error
+            {% else %}toast-info{% endif %}">
+            <span class="mt-0.5">
+                {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% else %}→{% endif %}
+            </span>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ═══════════════════════════════════════
+         CONTENU PRINCIPAL
+    ═══════════════════════════════════════ -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ═══════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════ -->
+    <footer class="footer-noise border-t border-iron-800 mt-24">
+
+        <!-- Bande orange fine -->
+        <div class="h-px bg-gradient-to-r from-transparent via-forge-600 to-transparent"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10">
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-14">
+
+                <!-- Colonne marque -->
+                <div class="md:col-span-5">
+                    <div class="font-display text-4xl font-bold tracking-wider mb-4">
+                        AUTO<span class="text-forge-500">KLIK</span>
+                    </div>
+                    <p class="text-iron-400 text-sm leading-relaxed max-w-xs">
+                        Expertise automobile depuis 2018. Chaque véhicule qui entre dans notre atelier repart avec notre signature de qualité.
+                    </p>
+
+                    <!-- Horaires -->
+                    <div class="mt-6 border border-iron-800 p-4 inline-block">
+                        <p class="font-display text-xs tracking-widest uppercase text-iron-500 mb-2">Horaires</p>
+                        <p class="text-iron-300 text-sm">Lun – Ven &nbsp;<span class="text-forge-400">7h00 – 18h00</span></p>
+                        <p class="text-iron-300 text-sm">Samedi &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-forge-400">8h00 – 15h00</span></p>
+                        <p class="text-iron-600 text-sm">Dimanche &nbsp;<span>Fermé</span></p>
+                    </div>
+                </div>
+
+                <!-- Navigation footer -->
+                <div class="md:col-span-3">
+                    <h4 class="font-display text-xs tracking-widest uppercase text-iron-500 mb-5">Navigation</h4>
+                    <ul class="space-y-3">
+                        {% for label, url_name in forloop_nav %}{% endfor %}
+                        <li><a href="{% url 'home' %}"        class="text-iron-400 hover:text-forge-400 text-sm transition-colors flex items-center gap-2"><span class="w-3 h-px bg-iron-700"></span>Accueil</a></li>
+                        <li><a href="{% url 'services' %}"    class="text-iron-400 hover:text-forge-400 text-sm transition-colors flex items-center gap-2"><span class="w-3 h-px bg-iron-700"></span>Services</a></li>
+                        <li><a href="{% url 'about' %}"       class="text-iron-400 hover:text-forge-400 text-sm transition-colors flex items-center gap-2"><span class="w-3 h-px bg-iron-700"></span>À propos</a></li>
+                        <li><a href="{% url 'contact' %}"     class="text-iron-400 hover:text-forge-400 text-sm transition-colors flex items-center gap-2"><span class="w-3 h-px bg-iron-700"></span>Contact</a></li>
+                        <li><a href="{% url 'appointment' %}" class="text-iron-400 hover:text-forge-400 text-sm transition-colors flex items-center gap-2"><span class="w-3 h-px bg-forge-700"></span>Prendre RDV</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact footer -->
+                <div class="md:col-span-4">
+                    <h4 class="font-display text-xs tracking-widest uppercase text-iron-500 mb-5">Contact</h4>
+                    <ul class="space-y-4 text-sm text-iron-400">
+                        <li class="flex items-start gap-3">
+                            <svg class="w-4 h-4 mt-0.5 text-forge-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span>Rue de la Réunification, Bastos<br>Yaoundé, Cameroun</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-4 h-4 text-forge-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.22 2.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.28-1.28a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+                            </svg>
+                            <a href="tel:+237655123456" class="hover:text-forge-400 transition-colors">+237 6 55 12 34 56</a>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-4 h-4 text-forge-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            <a href="mailto:contact@autoklik-garage.cm" class="hover:text-forge-400 transition-colors">contact@autoklik-garage.cm</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bas de footer -->
+            <div class="border-t border-iron-800/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-iron-600">
+                <p class="tracking-wide">© 2025 AutoKlik. Tous droits réservés.</p>
+                <div class="flex items-center gap-6 tracking-widest uppercase">
+                    <a href="/admin/"                      class="hover:text-iron-300 transition-colors">Admin</a>
+                    <a href="{% url 'dashboard_index' %}"  class="hover:text-forge-400 transition-colors text-forge-700 font-display font-semibold">Espace Gérant</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

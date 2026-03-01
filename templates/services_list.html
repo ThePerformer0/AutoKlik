@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Services — AutoKlik Garage Expert{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════════════════════════
+     HEADER SERVICES
+═══════════════════════════════════════ -->
+<section class="relative py-32 overflow-hidden border-b border-iron-800">
+    <!-- Fond décoratif -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-20">
+        <span
+            class="font-display font-bold text-[18vw] leading-none text-iron-800 tracking-tighter uppercase italic">EXPERT</span>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-3xl">
+            <span class="font-display text-xs tracking-[0.4em] uppercase text-forge-600 block mb-4">— Catalogue
+                Technique</span>
+            <h1 class="font-display font-bold text-6xl sm:text-8xl text-iron-50 leading-none mb-8">
+                NOS<br><span class="text-forge-500">SERVICES</span>
+            </h1>
+            <p class="text-iron-400 text-lg md:text-xl leading-relaxed max-w-xl border-l-2 border-forge-700 pl-6">
+                Chaque intervention est réalisée selon les normes strictes des constructeurs. Nous allions savoir-faire
+                traditionnel et technologies de pointe.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     LISTE DES SERVICES
+═══════════════════════════════════════ -->
+<section class="py-24 bg-iron-950/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-12">
+            {% for service in services %}
+            <article
+                class="group relative bg-iron-900/10 border border-iron-800 hover:border-iron-700 transition-all duration-500 overflow-hidden">
+                <div class="flex flex-col lg:flex-row items-stretch">
+
+                    <!-- Visuel -->
+                    <div class="lg:w-1/3 relative aspect-square lg:aspect-auto overflow-hidden bg-iron-900">
+                        <!-- Image ou Placeholder -->
+                        <div
+                            class="absolute inset-0 grayscale opacity-40 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+                            {% if service.image %}
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}"
+                                class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-iron-950">
+                                <svg class="w-24 h-24 text-iron-800" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="0.5">
+                                    <path
+                                        d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3-3a1 1 0 000-1.4l-1.6-1.6a1 1 0 00-1.4 0l-3 3z" />
+                                    <path d="M13 8L4 17v3h3l9-9" />
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Badge Prix -->
+                        {% if service.price_display %}
+                        <div class="absolute top-0 left-0 bg-forge-600 px-6 py-3">
+                            <span class="font-display font-bold text-iron-950 text-sm tracking-widest uppercase">{{
+                                service.price_display }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Déco coins -->
+                        <div
+                            class="absolute bottom-6 right-6 w-12 h-12 border-r border-b border-forge-600/30 group-hover:border-forge-600 transition-colors">
+                        </div>
+                    </div>
+
+                    <!-- Contenu -->
+                    <div class="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center relative">
+                        <!-- Chiffre fond -->
+                        <span
+                            class="absolute top-10 right-10 font-display text-8xl font-black text-white/[0.02] group-hover:text-white/[0.04] transition-colors pointer-events-none select-none">
+                            0{{ forloop.counter }}
+                        </span>
+
+                        <div class="relative z-10">
+                            <h2
+                                class="font-display text-4xl lg:text-5xl font-bold text-iron-50 uppercase tracking-tight mb-6 group-hover:text-forge-500 transition-colors">
+                                {{ service.name }}
+                            </h2>
+                            <p class="text-iron-400 text-lg leading-relaxed mb-10 max-w-2xl">
+                                {{ service.description }}
+                            </p>
+
+                            <div class="flex flex-col sm:flex-row items-center gap-6">
+                                <a href="{% url 'appointment' %}"
+                                    class="btn-rdv !px-10 !py-4 shadow-[0_0_30px_rgba(234,88,12,0)] group-hover:shadow-[0_0_30px_rgba(234,88,12,0.15)]">
+                                    Réserver ce service
+                                </a>
+                                <span
+                                    class="text-iron-600 font-display text-xs uppercase tracking-[0.2em] font-bold">Intervention
+                                    certifiée</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="py-24 text-center border-2 border-dashed border-iron-800">
+                <p class="font-display text-xl text-iron-600 uppercase tracking-widest italic">Le catalogue est en cours
+                    de mise à jour</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION GARANTIE
+═══════════════════════════════════════ -->
+<section class="py-32 bg-iron-950 border-t border-iron-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-iron-900/50 border border-iron-800 p-12 lg:p-20 relative overflow-hidden">
+            <div class="absolute -top-24 -left-24 w-64 h-64 border border-forge-600/5 rotate-45 pointer-events-none">
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-16 relative z-10">
+                <div class="lg:col-span-1">
+                    <h3 class="font-display font-bold text-4xl text-iron-50 uppercase leading-none mb-6">L'ENGAGEMENT
+                        <br><span class="text-forge-600 italic">KLIK</span></h3>
+                    <div class="w-16 h-1 bg-forge-600 mb-8"></div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="font-display text-xl font-bold text-iron-200 tracking-wide uppercase italic">— Pièces
+                        d'origine</h4>
+                    <p class="text-iron-500 text-sm leading-relaxed">
+                        Chaque boulon, chaque filtre, chaque composant est rigoureusement sélectionné parmi les
+                        meilleures marques constructeurs mondiales.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="font-display text-xl font-bold text-iron-200 tracking-wide uppercase italic">— Garantie
+                        Totale</h4>
+                    <p class="text-iron-500 text-sm leading-relaxed">
+                        Nous ne vous laissons pas seul. Toutes nos mains d'œuvre sont garanties 12 mois pour votre
+                        sérénité absolue.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

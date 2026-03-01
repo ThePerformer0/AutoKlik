@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}À Propos — L'Atelier AutoKlik Yaoundé{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════════════════════════
+     HEADER ABOUT
+═══════════════════════════════════════ -->
+<section class="relative py-40 overflow-hidden border-b border-iron-800 bg-iron-950">
+    <!-- Texture Mechanique fond -->
+    <div
+        class="absolute inset-0 z-0 opacity-5 grayscale bg-[url('https://images.unsplash.com/photo-1517524206127-48bbd36213b7?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+            <div class="lg:col-span-8">
+                <span class="font-display text-xs tracking-[0.5em] uppercase text-forge-600 block mb-6 animate-pulse">//
+                    Code d'Honneur</span>
+                <h1
+                    class="font-display font-bold text-7xl sm:text-9xl text-iron-50 leading-[0.85] mb-0 tracking-tighter italic uppercase">
+                    L'ÂME DE <br> <span class="text-forge-500 not-italic">L'ACIER</span>
+                </h1>
+            </div>
+            <div class="lg:col-span-4 pb-4">
+                <p
+                    class="text-iron-400 text-lg border-l-2 border-iron-800 pl-6 leading-relaxed uppercase tracking-widest font-display italic">
+                    Bienvenue dans le sanctuaire de la précision automobile.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     HISTOIRE & VISION
+═══════════════════════════════════════ -->
+<section class="py-32 bg-iron-950 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center mb-32">
+
+            <div class="relative order-2 lg:order-1">
+                <!-- Décoration coins -->
+                <div class="absolute -top-6 -left-6 w-32 h-32 border-l border-t border-forge-600/30"></div>
+                <div class="absolute -bottom-6 -right-6 w-32 h-32 border-r border-b border-forge-600/30"></div>
+
+                <div class="aspect-square bg-iron-900 border border-iron-800 overflow-hidden p-2">
+                    <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1983&auto=format&fit=crop"
+                        alt="Ingénierie automobile"
+                        class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-1000">
+                </div>
+            </div>
+
+            <div class="order-1 lg:order-2">
+                <h2 class="font-display font-bold text-5xl text-iron-50 uppercase leading-none mb-10">DEPUIS <span
+                        class="text-forge-600">2018</span></h2>
+                <div class="space-y-8 text-iron-400 text-lg leading-relaxed">
+                    <p>
+                        AutoKlik est né d'une vision radicale : transformer l'entretien automobile à Yaoundé en une
+                        expérience de précision aéronautique.
+                    </p>
+                    <p>
+                        Notre fondateur, obsédé par les tolérances millimétriques et la transparence mécanique, a bâti
+                        cet atelier pour les conducteurs qui ne transigent pas avec la <span
+                            class="text-iron-100 font-display font-bold italic tracking-wide">PERFORMANCE</span>.
+                    </p>
+                    <div class="grid grid-cols-2 gap-10 pt-8 border-t border-iron-800">
+                        <div>
+                            <span class="font-display font-black text-4xl text-white italic block">7+ ANS</span>
+                            <span
+                                class="text-xs uppercase tracking-[0.3em] font-display text-iron-600">D'Inflexibilité</span>
+                        </div>
+                        <div>
+                            <span class="font-display font-black text-4xl text-white italic block">10k+</span>
+                            <span class="text-xs uppercase tracking-[0.3em] font-display text-iron-600">Boulons
+                                Serrés</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             VALEURS BRUTES
+        ═══════════════════════════════════════ -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-iron-800 border border-iron-800 mt-24">
+            <div class="bg-iron-950 p-16 group hover:bg-iron-900 transition-all duration-500">
+                <div class="w-12 h-12 mb-10 text-forge-600 group-hover:scale-110 transition-transform">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+                <h3 class="font-display text-2xl font-bold text-iron-50 uppercase mb-4 tracking-wider italic">Sécurité
+                    Totale</h3>
+                <p class="text-iron-500 text-sm leading-relaxed">Zéro compromis sur la liaison au sol et le freinage.
+                    Votre sécurité est notre seule obsession.</p>
+            </div>
+
+            <div class="bg-iron-950 p-16 group hover:bg-iron-900 transition-all duration-500 select-none">
+                <div class="w-12 h-12 mb-10 text-forge-600 group-hover:scale-110 transition-transform">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                    </svg>
+                </div>
+                <h3 class="font-display text-2xl font-bold text-iron-50 uppercase mb-4 tracking-wider italic">Précision
+                    Calibrée</h3>
+                <p class="text-iron-500 text-sm leading-relaxed">Diagnostic informatisé et outils de métrologie de haute
+                    précision pour chaque intervention.</p>
+            </div>
+
+            <div class="bg-iron-950 p-16 group hover:bg-iron-900 transition-all duration-500">
+                <div class="w-12 h-12 mb-10 text-forge-600 group-hover:scale-110 transition-transform">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                        <path d="M16 3.13a4 4 0 010 7.75" />
+                    </svg>
+                </div>
+                <h3 class="font-display text-2xl font-bold text-iron-50 uppercase mb-4 tracking-wider italic">Passion
+                    Brut</h3>
+                <p class="text-iron-500 text-sm leading-relaxed">Une équipe de passionnés dont l'huile coule dans les
+                    veines au service de votre moteur.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
