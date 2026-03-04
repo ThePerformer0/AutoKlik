@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de Bord — AutoKlik Garage{% endblock %}
+
+{% block content %}
+<section class="py-12 bg-iron-950 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- HEADER DASHBOARD -->
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div>
+                <span class="text-forge-600 font-display text-xs tracking-[0.4em] uppercase block mb-4">// Système de
+                    Gestion</span>
+                <h1 class="font-display font-bold text-5xl text-iron-50 uppercase tracking-tighter">Tableau de <span
+                        class="text-forge-500 italic">Bord</span></h1>
+            </div>
+            <div class="flex gap-4">
+                <a href="{% url 'admin:index' %}"
+                    class="px-6 py-2 border border-iron-800 text-iron-500 font-display text-xs tracking-widest uppercase hover:bg-iron-900 transition-colors">
+                    Accès Django Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- STATS RAPIDES -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-px bg-iron-800 border border-iron-800 mb-12">
+            <div class="bg-iron-900 p-8">
+                <p class="text-iron-500 font-display text-xs tracking-widest uppercase mb-2">RDV Aujourd'hui</p>
+                <p class="text-4xl font-display font-black text-white italic">0</p>
+            </div>
+            <div class="bg-iron-900 p-8">
+                <p class="text-iron-500 font-display text-xs tracking-widest uppercase mb-2">Demandes Libres</p>
+                <p class="text-4xl font-display font-black text-forge-500 italic">0</p>
+            </div>
+            <div class="bg-iron-900 p-8">
+                <p class="text-iron-500 font-display text-xs tracking-widest uppercase mb-2">Avis à Modérer</p>
+                <p class="text-4xl font-display font-black text-white italic">0</p>
+            </div>
+            <div class="bg-iron-900 p-8">
+                <p class="text-iron-500 font-display text-xs tracking-widest uppercase mb-2">Total Services</p>
+                <p class="text-4xl font-display font-black text-white italic">0</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+            <!-- LISTE RDV RÉCENTS -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-iron-900 border border-iron-800 p-8">
+                    <h2
+                        class="font-display font-bold text-xl text-iron-50 uppercase tracking-widest mb-8 flex items-center gap-3">
+                        <span class="w-1.5 h-6 bg-forge-600"></span>
+                        Rendez-vous à venir
+                    </h2>
+                    <div class="space-y-4">
+                        <p
+                            class="text-iron-600 text-sm italic font-display uppercase tracking-widest text-center py-12 border border-dashed border-iron-800">
+                            Aucun rendez-vous planifié
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MESSAGES ET AVIS RÉCENTS -->
+            <div class="space-y-8">
+                <div class="bg-iron-900 border border-iron-800 p-8">
+                    <h2
+                        class="font-display font-bold text-xl text-iron-50 uppercase tracking-widest mb-8 flex items-center gap-3">
+                        <span class="w-1.5 h-6 bg-forge-600"></span>
+                        Derniers Messages
+                    </h2>
+                    <div class="space-y-4">
+                        <p class="text-iron-600 text-sm italic py-8 text-center">Aucun message</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

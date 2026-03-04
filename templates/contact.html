@@ -76,34 +76,31 @@
                     <h2 class="font-display text-3xl font-bold text-white uppercase tracking-wider mb-12 italic">Espace
                         Transmission</h2>
 
-                    <form method="POST" class="space-y-10">
+                    <form method="post" class="space-y-8 relative z-10">
                         {% csrf_token %}
-                        <div class="space-y-2 group">
-                            <label
-                                class="font-display text-[10px] tracking-[0.4em] uppercase text-iron-600 group-focus-within:text-forge-600 transition-colors font-bold">Identité
-                                du client</label>
-                            <input type="text" name="name" required placeholder="NOM COMPLET"
-                                class="w-full bg-transparent border-b border-iron-800 focus:border-forge-600 outline-none py-3 text-iron-200 font-display tracking-[0.15em] transition-all placeholder:text-iron-800">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-2 group">
+                                <label
+                                    class="font-display text-[10px] tracking-[0.4em] uppercase text-iron-600 group-focus-within:text-forge-600 transition-colors font-bold">Identité
+                                    du client</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="space-y-2 group">
+                                <label
+                                    class="font-display text-[10px] tracking-[0.4em] uppercase text-iron-600 group-focus-within:text-forge-600 transition-colors font-bold">Canal
+                                    de retour</label>
+                                {{ form.email }}
+                            </div>
                         </div>
-
-                        <div class="space-y-2 group">
-                            <label
-                                class="font-display text-[10px] tracking-[0.4em] uppercase text-iron-600 group-focus-within:text-forge-600 transition-colors font-bold">Canal
-                                de retour</label>
-                            <input type="email" name="email" required placeholder="EMAIL@ADRESSE.COM"
-                                class="w-full bg-transparent border-b border-iron-800 focus:border-forge-600 outline-none py-3 text-iron-200 font-display tracking-[0.15em] transition-all placeholder:text-iron-800">
-                        </div>
-
                         <div class="space-y-2 group">
                             <label
                                 class="font-display text-[10px] tracking-[0.4em] uppercase text-iron-600 group-focus-within:text-forge-600 transition-colors font-bold">Détails
                                 de la requête</label>
-                            <textarea name="message" rows="4" required placeholder="DÉCRIVEZ VOTRE BESOIN..."
-                                class="w-full bg-transparent border border-iron-800 focus:border-forge-600 outline-none p-4 text-iron-300 font-body transition-all placeholder:text-iron-800"></textarea>
+                            {{ form.message }}
                         </div>
 
-                        <button type="submit" class="btn-rdv w-full !py-6 !text-lg !tracking-[0.3em]">
-                            ENVOYER MAINTENANT
+                        <button type="submit" class="btn-rdv w-full !py-5 !text-lg !tracking-[0.3em]">
+                            Transmettre la notice
                         </button>
                     </form>
                 </div>
