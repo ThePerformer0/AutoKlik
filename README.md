@@ -6,7 +6,15 @@
 
 **AutoKlik** est une application web complète pour un garage automobile (Yaoundé, Cameroun). Elle combine un **site vitrine professionnel** pour les clients et un **Dashboard d'administration sur-mesure** pour le gérant.
 
+---
+
 🔗 **Démo Live** : [https://autoklik.onrender.com](https://autoklik.onrender.com)
+
+> [!IMPORTANT]
+> **Accès Dashboard (Démo)** :
+> - **URL** : `/dashboard/`
+> - **Utilisateur** : `admin`
+> - **Mot de passe** : `admin123`
 
 ---
 
