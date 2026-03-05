@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard – AutoKlik{% endblock %}</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blue:  { DEFAULT: '#2563EB', dark: '#1D4ED8', light: '#EFF6FF' },
+            side:  { DEFAULT: '#0D0D0D', 2: '#141414', 3: '#1C1C1C', border: '#262626' },
+            ink:   { DEFAULT: '#111827', 2: '#374151', 3: '#6B7280' },
+            surface: { DEFAULT: '#F9FAFB', 2: '#F3F4F6', border: '#E5E7EB' },
+          },
+          fontFamily: {
+            display: ['"Bebas Neue"', 'sans-serif'],
+            body:    ['"Outfit"', 'sans-serif'],
+          },
+          width:  { sidebar: '240px' },
+          margin: { sidebar: '240px' },
+        },
+      },
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Free -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+
+  <!-- Dashboard CSS (isolé du site public) -->
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="font-body bg-surface text-ink">
+
+  <!-- ══════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════ -->
+  <aside id="sidebar"
+         class="fixed top-0 left-0 h-full w-sidebar bg-side flex flex-col z-40
+                transition-transform duration-300">
+
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-5 py-5 border-b border-side-border">
+      <span class="w-8 h-8 bg-blue flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-bolt text-white text-sm"></i>
+      </span>
+      <div class="leading-none">
+        <span class="font-display text-white text-xl tracking-[.12em]">AUTO<span class="text-blue">KLIK</span></span>
+        <p class="text-white/25 text-[10px] tracking-[.15em] uppercase mt-0.5">Administration</p>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 overflow-y-auto py-4 px-3">
+
+      <p class="text-white/20 text-[10px] font-semibold tracking-[.2em] uppercase px-3 mb-3">Principal</p>
+
+      <ul class="space-y-0.5 mb-6">
+        <li>
+          <a href="{% url 'dashboard_home' %}"
+             class="dash-nav-link"
+             data-url="{% url 'dashboard_home' %}">
+            <i class="fa-solid fa-gauge w-5 text-center"></i>
+            <span>Tableau de bord</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'appointment_manage' %}"
+             class="dash-nav-link"
+             data-url="{% url 'appointment_manage' %}">
+            <i class="fa-regular fa-calendar-check w-5 text-center"></i>
+            <span>Rendez-vous</span>
+            {% if pending_count %}
+            <span class="ml-auto bg-blue text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+              {{ pending_count }}
+            </span>
+            {% endif %}
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'review_list' %}"
+             class="dash-nav-link"
+             data-url="{% url 'review_list' %}">
+            <i class="fa-regular fa-star w-5 text-center"></i>
+            <span>Avis clients</span>
+            {% if pending_reviews %}
+            <span class="ml-auto bg-yellow-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+              {{ pending_reviews }}
+            </span>
+            {% endif %}
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'message_manage' %}"
+             class="dash-nav-link"
+             data-url="{% url 'message_manage' %}">
+            <i class="fa-regular fa-envelope w-5 text-center"></i>
+            <span>Messages</span>
+            {% if unread_messages %}
+            <span class="ml-auto bg-blue text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+              {{ unread_messages }}
+            </span>
+            {% endif %}
+          </a>
+        </li>
+      </ul>
+
+      <p class="text-white/20 text-[10px] font-semibold tracking-[.2em] uppercase px-3 mb-3">Catalogue</p>
+
+      <ul class="space-y-0.5">
+        <li>
+          <a href="{% url 'service_manage' %}"
+             class="dash-nav-link"
+             data-url="{% url 'service_manage' %}">
+            <i class="fa-solid fa-wrench w-5 text-center"></i>
+            <span>Services</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'garage_settings' %}"
+             class="dash-nav-link"
+             data-url="{% url 'garage_settings' %}">
+            <i class="fa-solid fa-gear w-5 text-center"></i>
+            <span>Paramètres garage</span>
+          </a>
+        </li>
+      </ul>
+
+    </nav>
+
+    <!-- User block + logout -->
+    <div class="border-t border-side-border p-4">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-8 h-8 bg-blue/20 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-user text-blue text-xs"></i>
+        </span>
+        <div class="min-w-0">
+          <p class="text-white/80 text-sm font-semibold truncate">{{ request.user.username }}</p>
+          <p class="text-white/30 text-xs">Gérant</p>
+        </div>
+      </div>
+      <a href="{% url 'logout' %}"
+         class="flex items-center gap-2 text-white/40 hover:text-red-400 text-xs transition-colors px-1">
+        <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
+        Se déconnecter
+      </a>
+    </div>
+
+  </aside>
+
+
+  <!-- ══════════════════════════════════════
+       MAIN WRAPPER
+  ══════════════════════════════════════ -->
+  <div id="main-wrapper" class="ml-sidebar min-h-screen flex flex-col">
+
+    <!-- ── Topbar ── -->
+    <header class="sticky top-0 z-30 bg-white border-b border-surface-border flex items-center justify-between px-8 h-14">
+
+      <!-- Mobile sidebar toggle -->
+      <button id="sidebar-toggle"
+              class="lg:hidden w-8 h-8 flex items-center justify-center text-ink/50 hover:text-ink"
+              aria-label="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <!-- Page title (filled via block) -->
+      <h1 class="font-display text-ink text-xl tracking-wide">
+        {% block page_title %}Dashboard{% endblock %}
+      </h1>
+
+      <!-- Right actions -->
+      <div class="flex items-center gap-4">
+        <!-- Link to public site -->
+        <a href="{% url 'index' %}" target="_blank"
+           class="hidden sm:inline-flex items-center gap-1.5 text-xs text-ink/40 hover:text-blue transition-colors">
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          Voir le site
+        </a>
+        <!-- User avatar -->
+        <span class="w-8 h-8 bg-blue flex items-center justify-center text-white font-display text-base">
+          {{ request.user.username|first|upper }}
+        </span>
+      </div>
+
+    </header>
+
+    <!-- ── Django messages ── -->
+    {% if messages %}
+    <div class="px-8 pt-4 space-y-2">
+      {% for message in messages %}
+      <div class="dash-toast flex items-center gap-3 text-sm px-4 py-3 border-l-4">
+        {% if 'success' in message.tags %}
+        <i class="fa-solid fa-circle-check text-green-500 flex-shrink-0"></i>
+        <span class="text-green-800 flex-1">{{ message }}</span>
+        {% elif 'error' in message.tags %}
+        <i class="fa-solid fa-circle-xmark text-red-500 flex-shrink-0"></i>
+        <span class="text-red-800 flex-1">{{ message }}</span>
+        {% else %}
+        <i class="fa-solid fa-circle-info text-blue flex-shrink-0"></i>
+        <span class="text-blue flex-1">{{ message }}</span>
+        {% endif %}
+        <button class="toast-close text-ink/30 hover:text-ink ml-2">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ── Page content ── -->
+    <main class="flex-1 px-8 py-8">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="px-8 py-4 border-t border-surface-border">
+      <p class="text-xs text-ink/25">© {% now "Y" %} AutoKlik · Administration</p>
+    </footer>
+
+  </div>
+
+  <!-- Mobile overlay -->
+  <div id="sidebar-overlay"
+       class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden"></div>
+
+
+  <!-- Dashboard JS -->
+  <script src="{% static 'js/dashboard.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,690 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}AutoKlik – Garage Automobile Professionnel à Yaoundé{% endblock %}
+{% block meta_description %}AutoKlik, garage de confiance à Yaoundé. Vidange, freinage, climatisation, diagnostic.
+Prenez rendez-vous en ligne.{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero relative bg-coal overflow-hidden min-h-[88vh] flex items-end">
+
+  <!-- Full-bleed background image -->
+  <div class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1625047509168-a7026f36de04?w=1600&auto=format&fit=crop&q=80" alt=""
+      class="w-full h-full object-cover object-center" onerror="this.src='https://picsum.photos/1600/900?grayscale'" />
+    <!-- Gradient overlay: dark at bottom where text sits -->
+    <div class="absolute inset-0 bg-gradient-to-t from-coal via-coal/60 to-coal/20"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative w-full max-w-7xl mx-auto px-6 lg:px-10 pb-20 pt-32">
+    <div class="max-w-3xl">
+
+      <!-- Eyebrow -->
+      <div class="flex items-center gap-3 mb-6">
+        <span class="w-8 h-[2px] bg-blue"></span>
+        <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">Garage Certifié · Yaoundé</span>
+      </div>
+
+      <!-- Title -->
+      <h1 class="font-display text-white leading-[.92] tracking-wide mb-8">
+        <span class="block text-7xl sm:text-8xl lg:text-[110px]">Votre Voiture</span>
+        <span class="block text-7xl sm:text-8xl lg:text-[110px] text-blue">Entre les</span>
+        <span class="block text-7xl sm:text-8xl lg:text-[110px]">Meilleurs Mains.</span>
+      </h1>
+
+      <!-- Sub -->
+      <p class="text-white/55 text-lg font-light leading-relaxed max-w-lg mb-10">
+        Techniciens certifiés, délais tenus, prix clairs. Prenez rendez-vous en ligne en moins de 2 minutes.
+      </p>
+
+      <!-- Buttons -->
+      <div class="flex flex-wrap gap-4 mb-16">
+        <a href="{% url 'appointment_request' %}"
+          class="inline-flex items-center gap-2.5 bg-blue hover:bg-blue-dark text-white font-semibold text-base px-8 py-4 transition-colors duration-150">
+          <i class="fa-regular fa-calendar-check"></i>
+          Prendre rendez-vous
+        </a>
+        <a href="{% url 'service_list' %}"
+          class="inline-flex items-center gap-2.5 border border-white/25 hover:border-white/60 text-white/70 hover:text-white font-medium text-base px-8 py-4 transition-all duration-150">
+          Nos services
+          <i class="fa-solid fa-arrow-right text-sm"></i>
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex flex-wrap gap-10 pt-8 border-t border-white/15">
+        <div>
+          <p class="font-display text-white text-5xl tracking-wide">500<span class="text-blue">+</span></p>
+          <p class="text-white/40 text-xs tracking-[.15em] uppercase mt-1">Clients satisfaits</p>
+        </div>
+        <div>
+          <p class="font-display text-white text-5xl tracking-wide">10<span class="text-blue">+</span></p>
+          <p class="text-white/40 text-xs tracking-[.15em] uppercase mt-1">Ans d'expérience</p>
+        </div>
+        <div>
+          <p class="font-display text-white text-5xl tracking-wide">48<span class="text-blue text-3xl">h</span></p>
+          <p class="text-white/40 text-xs tracking-[.15em] uppercase mt-1">Délai moyen</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SERVICES
+══════════════════════════════════════ -->
+<section class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+      <div>
+        <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">Ce que nous faisons</span>
+        <h2 class="font-display text-coal text-6xl sm:text-7xl tracking-wide mt-2 leading-none">
+          Nos Services
+        </h2>
+      </div>
+      <a href="{% url 'service_list' %}"
+        class="inline-flex items-center gap-2 text-sm font-semibold text-blue hover:gap-3 transition-all duration-150 self-end pb-1 border-b border-blue/40 hover:border-blue whitespace-nowrap">
+        Voir tout
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {% for service in services %}
+      <a href="{% url 'appointment_request' %}?service={{ service.id }}"
+        class="service-card group block bg-smoke hover:bg-white border border-transparent hover:border-blue/20 hover:shadow-lg transition-all duration-200">
+
+        <!-- Image -->
+        <div class="aspect-video overflow-hidden bg-smoke-2">
+          {% if service.image %}
+          <img src="{{ service.image.url }}" alt="{{ service.name }}"
+            class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+          {% else %}
+          <div class="w-full h-full flex items-center justify-center bg-coal/5">
+            <i class="fa-solid fa-wrench text-coal/20 text-3xl"></i>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Body -->
+        <div class="p-5">
+          <h3 class="font-display text-coal text-2xl tracking-wide mb-2 group-hover:text-blue transition-colors">
+            {{ service.name }}
+          </h3>
+          <p class="text-coal/50 text-sm leading-relaxed line-clamp-2 mb-4">{{ service.description }}</p>
+          {% if service.price_display %}
+          <p class="text-blue text-xs font-semibold tracking-wide mb-4">{{ service.price_display }}</p>
+          {% endif %}
+          <span
+            class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue group-hover:gap-3 transition-all duration-150">
+            Prendre RDV <i class="fa-solid fa-arrow-right text-xs"></i>
+          </span>
+        </div>
+
+        <!-- Bottom accent bar -->
+        <div class="h-[3px] bg-blue scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left">
+        </div>
+      </a>
+      {% empty %}
+      <!-- Placeholder skeleton si pas encore de données -->
+      {% for i in "1234" %}
+      <div class="bg-smoke border border-smoke-2">
+        <div class="aspect-video bg-smoke-2 flex items-center justify-center">
+          <i class="fa-solid fa-wrench text-coal/15 text-3xl"></i>
+        </div>
+        <div class="p-5 space-y-3">
+          <div class="h-6 w-3/4 bg-coal/8 rounded"></div>
+          <div class="h-3 w-full bg-coal/5 rounded"></div>
+          <div class="h-3 w-2/3 bg-coal/5 rounded"></div>
+        </div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     POURQUOI NOUS
+══════════════════════════════════════ -->
+<section class="py-24 bg-coal-2">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <!-- Header -->
+    <div class="mb-14">
+      <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">Notre différence</span>
+      <h2 class="font-display text-white text-6xl sm:text-7xl tracking-wide mt-2 leading-none">
+        Pourquoi AutoKlik ?
+      </h2>
+    </div>
+
+    <!-- 6 cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <div
+        class="why-card bg-coal-3 border border-white/8 p-8 hover:border-blue/40 transition-colors duration-200 group">
+        <i class="fa-solid fa-shield-halved text-blue text-2xl mb-6"></i>
+        <h3 class="font-display text-white text-2xl tracking-wide mb-3">Qualité certifiée</h3>
+        <p class="text-white/45 text-sm leading-relaxed">
+          Techniciens formés et certifiés. Chaque intervention est vérifiée selon les standards constructeurs.
+        </p>
+      </div>
+
+      <div
+        class="why-card bg-coal-3 border border-white/8 p-8 hover:border-blue/40 transition-colors duration-200 group">
+        <i class="fa-regular fa-clock text-blue text-2xl mb-6"></i>
+        <h3 class="font-display text-white text-2xl tracking-wide mb-3">Délais tenus</h3>
+        <p class="text-white/45 text-sm leading-relaxed">
+          Votre temps compte. Nous respectons les délais annoncés et vous informons à chaque étape.
+        </p>
+      </div>
+
+      <div
+        class="why-card bg-coal-3 border border-white/8 p-8 hover:border-blue/40 transition-colors duration-200 group">
+        <i class="fa-solid fa-receipt text-blue text-2xl mb-6"></i>
+        <h3 class="font-display text-white text-2xl tracking-wide mb-3">Prix transparents</h3>
+        <p class="text-white/45 text-sm leading-relaxed">
+          Devis clair avant toute intervention. Aucune mauvaise surprise sur votre facture.
+        </p>
+      </div>
+
+      <div
+        class="why-card bg-coal-3 border border-white/8 p-8 hover:border-blue/40 transition-colors duration-200 group">
+        <i class="fa-solid fa-calendar-check text-blue text-2xl mb-6"></i>
+        <h3 class="font-display text-white text-2xl tracking-wide mb-3">RDV en ligne</h3>
+        <p class="text-white/45 text-sm leading-relaxed">
+          Réservez votre créneau 24h/24. Confirmation immédiate par email, sans appel nécessaire.
+        </p>
+      </div>
+
+      <div
+        class="why-card bg-coal-3 border border-white/8 p-8 hover:border-blue/40 transition-colors duration-200 group">
+        <i class="fa-solid fa-car text-blue text-2xl mb-6"></i>
+        <h3 class="font-display text-white text-2xl tracking-wide mb-3">Multi-marques</h3>
+        <p class="text-white/45 text-sm leading-relaxed">
+          Toyota, Peugeot, Renault, Mercedes… Notre équipe maîtrise toutes les marques du marché.
+        </p>
+      </div>
+
+      <div
+        class="why-card bg-coal-3 border border-white/8 p-8 hover:border-blue/40 transition-colors duration-200 group">
+        <i class="fa-solid fa-handshake text-blue text-2xl mb-6"></i>
+        <h3 class="font-display text-white text-2xl tracking-wide mb-3">Service humain</h3>
+        <p class="text-white/45 text-sm leading-relaxed">
+          Ici vous n'êtes pas un numéro. On prend le temps d'expliquer, conseiller et accompagner.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     AVIS CLIENTS
+══════════════════════════════════════ -->
+<section class="py-24 bg-smoke">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+      <div>
+        <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">Ce qu'ils disent</span>
+        <h2 class="font-display text-coal text-6xl sm:text-7xl tracking-wide mt-2 leading-none">
+          Avis Clients
+        </h2>
+      </div>
+      <button type="button"
+              id="open-review-modal"
+              class="inline-flex items-center gap-2.5 bg-coal hover:bg-coal-2 text-white font-semibold text-sm px-6 py-3.5 transition-colors duration-150 self-end">
+        <i class="fa-regular fa-pen-to-square"></i>
+        Laisser un avis
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {% for review in reviews %}
+      <div class="bg-white border border-smoke-2 p-7 hover:shadow-md transition-shadow duration-200">
+
+        <!-- Stars -->
+        <div class="flex gap-1 mb-5" aria-label="Note {{ review.rating }} sur 5">
+          {% for i in "12345" %}
+          <i class="fa-solid fa-star text-sm star-item" data-index="{{ forloop.counter }}"
+            data-rating="{{ review.rating }}"></i>
+          {% endfor %}
+        </div>
+
+        <!-- Comment -->
+        <p class="text-coal/60 text-sm leading-relaxed italic mb-7">
+          "{{ review.comment }}"
+        </p>
+
+        <!-- Author -->
+        <div class="flex items-center gap-3 pt-5 border-t border-smoke-2">
+          <span
+            class="w-9 h-9 bg-blue flex items-center justify-center text-white font-display text-base flex-shrink-0">
+            {{ review.author_name|first|upper }}
+          </span>
+          <div>
+            <p class="font-semibold text-coal text-sm">{{ review.author_name }}</p>
+            <p class="text-coal/35 text-xs">Client vérifié</p>
+          </div>
+        </div>
+
+      </div>
+      {% empty %}
+      <!-- Placeholder reviews -->
+      <div class="bg-white border border-smoke-2 p-7">
+        <div class="flex gap-1 mb-5">
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+        </div>
+        <p class="text-coal/55 text-sm leading-relaxed italic mb-7">
+          "Service impeccable. Ma voiture réparée en moins de 24h. Je recommande AutoKlik à tous mes proches."
+        </p>
+        <div class="flex items-center gap-3 pt-5 border-t border-smoke-2">
+          <span class="w-9 h-9 bg-blue flex items-center justify-center text-white font-display text-base">M</span>
+          <div>
+            <p class="font-semibold text-coal text-sm">Martin K.</p>
+            <p class="text-coal/35 text-xs">Client vérifié</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-smoke-2 p-7">
+        <div class="flex gap-1 mb-5">
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+        </div>
+        <p class="text-coal/55 text-sm leading-relaxed italic mb-7">
+          "RDV pris en ligne en deux minutes. Équipe sérieuse, tarifs justes. Je suis pleinement satisfaite."
+        </p>
+        <div class="flex items-center gap-3 pt-5 border-t border-smoke-2">
+          <span class="w-9 h-9 bg-blue flex items-center justify-center text-white font-display text-base">A</span>
+          <div>
+            <p class="font-semibold text-coal text-sm">Amina B.</p>
+            <p class="text-coal/35 text-xs">Client vérifié</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-smoke-2 p-7">
+        <div class="flex gap-1 mb-5">
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-solid fa-star text-sm text-yellow-400"></i>
+          <i class="fa-regular fa-star text-sm text-coal/20"></i>
+        </div>
+        <p class="text-coal/55 text-sm leading-relaxed italic mb-7">
+          "Très bon accueil. Mon problème de climatisation réglé en une journée. Personnel compétent."
+        </p>
+        <div class="flex items-center gap-3 pt-5 border-t border-smoke-2">
+          <span class="w-9 h-9 bg-blue flex items-center justify-center text-white font-display text-base">P</span>
+          <div>
+            <p class="font-semibold text-coal text-sm">Paul N.</p>
+            <p class="text-coal/35 text-xs">Client vérifié</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CTA BANNER
+══════════════════════════════════════ -->
+<section class="bg-blue py-20">
+  <div class="max-w-4xl mx-auto px-6 lg:px-10 text-center">
+    <h2 class="font-display text-white text-6xl sm:text-7xl tracking-wide leading-none mb-5">
+      Votre Véhicule Nous Attend.
+    </h2>
+    <p class="text-white/65 text-lg font-light mb-10 max-w-xl mx-auto">
+      Réservez en ligne en moins de 2 minutes. Confirmation immédiate par email.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="{% url 'appointment_request' %}"
+        class="inline-flex items-center gap-2.5 bg-white text-blue font-bold text-base px-8 py-4 hover:bg-smoke transition-colors duration-150">
+        <i class="fa-regular fa-calendar-check"></i>
+        Prendre rendez-vous
+      </a>
+      <a href="tel:+237600000000"
+        class="inline-flex items-center gap-2.5 border-2 border-white text-white font-bold text-base px-8 py-4 hover:bg-white/10 transition-colors duration-150">
+        <i class="fa-solid fa-phone"></i>
+        Nous appeler
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     À PROPOS
+══════════════════════════════════════ -->
+<section class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Image -->
+      <div class="relative">
+        <div class="aspect-[4/3] overflow-hidden bg-smoke">
+          <img src="https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=800&auto=format&fit=crop&q=80"
+            alt="Équipe AutoKlik au travail" class="w-full h-full object-cover"
+            onerror="this.src='https://picsum.photos/800/600'" />
+        </div>
+        <!-- Floating stat -->
+        <div class="absolute -bottom-6 -right-6 bg-coal text-white px-7 py-5 shadow-xl">
+          <p class="font-display text-5xl text-blue leading-none">10<span class="text-white text-3xl">+</span></p>
+          <p class="text-white/40 text-xs tracking-[.18em] uppercase mt-1">Ans d'expérience</p>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="lg:pl-4">
+        <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">Qui sommes-nous</span>
+        <h2 class="font-display text-coal text-6xl sm:text-7xl tracking-wide mt-2 leading-none mb-7">
+          À propos d'AutoKlik
+        </h2>
+        <p class="text-coal/55 leading-relaxed mb-5">
+          Fondé à Yaoundé, AutoKlik est devenu l'une des références de l'entretien automobile dans la capitale
+          camerounaise. Notre mission : vous offrir un service professionnel, accessible et sans mauvaises surprises.
+        </p>
+        <p class="text-coal/55 leading-relaxed mb-8">
+          Notre équipe de techniciens passionnés prend en charge tous types de véhicules — des révisions courantes aux
+          réparations les plus complexes.
+        </p>
+
+        <!-- Checklist -->
+        <ul class="space-y-3 mb-10">
+          <li class="flex items-center gap-3 text-sm text-coal/70">
+            <span class="w-5 h-5 bg-blue flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-check text-white text-[10px]"></i>
+            </span>
+            Techniciens certifiés et régulièrement formés
+          </li>
+          <li class="flex items-center gap-3 text-sm text-coal/70">
+            <span class="w-5 h-5 bg-blue flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-check text-white text-[10px]"></i>
+            </span>
+            Pièces de rechange d'origine et garanties
+          </li>
+          <li class="flex items-center gap-3 text-sm text-coal/70">
+            <span class="w-5 h-5 bg-blue flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-check text-white text-[10px]"></i>
+            </span>
+            Service après-vente disponible et réactif
+          </li>
+        </ul>
+
+        <a href="{% url 'contact' %}"
+          class="inline-flex items-center gap-2.5 bg-blue hover:bg-blue-dark text-white font-semibold text-sm px-7 py-3.5 transition-colors duration-150">
+          Nous contacter
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     MODALE — LAISSER UN AVIS
+══════════════════════════════════════ -->
+<div id="review-modal"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+  <!-- Overlay -->
+  <div id="review-overlay" class="absolute inset-0 bg-black/60"></div>
+
+  <!-- Panneau -->
+  <div class="relative bg-white w-full max-w-lg z-10 shadow-2xl">
+
+    <!-- Header modale -->
+    <div class="flex items-center justify-between px-7 py-5 border-b border-smoke-2">
+      <div>
+        <h3 class="font-display text-coal text-3xl tracking-wide">Votre avis</h3>
+        <p class="text-coal/40 text-xs mt-0.5">Votre commentaire sera visible après validation.</p>
+      </div>
+      <button id="close-review-modal"
+              class="w-8 h-8 flex items-center justify-center text-coal/40 hover:text-coal transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Formulaire -->
+    <form method="POST" action="{% url 'review_submit' %}" id="review-form" novalidate>
+      {% csrf_token %}
+
+      <div class="px-7 py-6 space-y-5">
+
+        <!-- Nom -->
+        <div>
+          <label for="review-name" class="review-label">
+            Votre nom <span class="text-blue">*</span>
+          </label>
+          <input type="text" id="review-name" name="author_name" required
+                 placeholder="Ex : Jean Dupont"
+                 class="review-input" />
+        </div>
+
+        <!-- Note par étoiles -->
+        <div>
+          <label class="review-label">
+            Note <span class="text-blue">*</span>
+          </label>
+          <div class="flex items-center gap-2 mt-1">
+            <div id="star-selector" class="flex items-center gap-1">
+              <i class="star-btn fa-regular fa-star text-2xl text-coal/25 cursor-pointer transition-colors" data-value="1"></i>
+              <i class="star-btn fa-regular fa-star text-2xl text-coal/25 cursor-pointer transition-colors" data-value="2"></i>
+              <i class="star-btn fa-regular fa-star text-2xl text-coal/25 cursor-pointer transition-colors" data-value="3"></i>
+              <i class="star-btn fa-regular fa-star text-2xl text-coal/25 cursor-pointer transition-colors" data-value="4"></i>
+              <i class="star-btn fa-regular fa-star text-2xl text-coal/25 cursor-pointer transition-colors" data-value="5"></i>
+            </div>
+            <span id="star-label" class="text-coal/35 text-xs ml-1">Sélectionnez une note</span>
+          </div>
+          <input type="hidden" id="review-rating" name="rating" value="" />
+        </div>
+
+        <!-- Commentaire -->
+        <div>
+          <label for="review-comment" class="review-label">
+            Commentaire <span class="text-blue">*</span>
+          </label>
+          <textarea id="review-comment" name="comment" rows="4" required
+                    placeholder="Partagez votre expérience avec AutoKlik…"
+                    class="review-input resize-none"></textarea>
+        </div>
+
+      </div>
+
+      <!-- Footer modale -->
+      <div class="flex items-center justify-between gap-4 px-7 py-5 border-t border-smoke-2 bg-smoke">
+        <p class="text-coal/35 text-xs">
+          <i class="fa-solid fa-lock text-blue mr-1"></i>
+          Avis soumis à validation avant publication.
+        </p>
+        <div class="flex items-center gap-3">
+          <button type="button" id="cancel-review-modal"
+                  class="text-coal/50 hover:text-coal font-semibold text-sm px-4 py-2.5 transition-colors">
+            Annuler
+          </button>
+          <button type="submit" id="review-submit-btn"
+                  class="inline-flex items-center gap-2 bg-blue hover:bg-blue-dark text-white font-semibold text-sm px-6 py-2.5 transition-colors duration-150 disabled:opacity-50">
+            <i class="fa-solid fa-paper-plane"></i>
+            Envoyer
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ── Étoiles dynamiques (évite les conditions dans les class) ──────────
+  document.querySelectorAll('.star-item').forEach(function (star) {
+    var index = parseInt(star.getAttribute('data-index'), 10);
+    var rating = parseInt(star.getAttribute('data-rating'), 10);
+    if (index <= rating) {
+      star.classList.add('text-yellow-400');
+    } else {
+      star.classList.remove('fa-solid');
+      star.classList.add('fa-regular', 'text-coal/20');
+    }
+  });
+
+  // ── Scroll reveal léger ───────────────────────────────────────────────
+  var reveals = document.querySelectorAll('.service-card, .why-card, .review-card');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(function (el) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity .5s ease, transform .5s ease';
+    io.observe(el);
+  });
+
+  // ── Modale avis ──────────────────────────────────────────────────────
+  var modal       = document.getElementById('review-modal');
+  var overlay     = document.getElementById('review-overlay');
+  var openBtn     = document.getElementById('open-review-modal');
+  var closeBtn    = document.getElementById('close-review-modal');
+  var cancelBtn   = document.getElementById('cancel-review-modal');
+  var submitBtn   = document.getElementById('review-submit-btn');
+  var ratingInput = document.getElementById('review-rating');
+  var starLabel   = document.getElementById('star-label');
+  var starBtns    = document.querySelectorAll('.star-btn');
+
+  var starLabels = ['', 'Très mauvais', 'Insuffisant', 'Correct', 'Bien', 'Excellent'];
+
+  function openModal() {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  if (openBtn)   openBtn.addEventListener('click', openModal);
+  if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  if (overlay)   overlay.addEventListener('click', closeModal);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Sélecteur d'étoiles
+  function renderStars(value) {
+    starBtns.forEach(function (star) {
+      var v = parseInt(star.getAttribute('data-value'), 10);
+      if (v <= value) {
+        star.classList.remove('fa-regular', 'text-coal/25');
+        star.classList.add('fa-solid', 'text-yellow-400');
+      } else {
+        star.classList.remove('fa-solid', 'text-yellow-400');
+        star.classList.add('fa-regular', 'text-coal/25');
+      }
+    });
+    starLabel.textContent = value > 0 ? starLabels[value] + ' (' + value + '/5)' : 'Sélectionnez une note';
+  }
+
+  starBtns.forEach(function (star) {
+    // Hover preview
+    star.addEventListener('mouseenter', function () {
+      renderStars(parseInt(this.getAttribute('data-value'), 10));
+    });
+    // Clic — enregistre la valeur
+    star.addEventListener('click', function () {
+      var val = parseInt(this.getAttribute('data-value'), 10);
+      ratingInput.value = val;
+      renderStars(val);
+    });
+  });
+
+  // Quand la souris quitte le sélecteur, revenir à la valeur sélectionnée
+  document.getElementById('star-selector').addEventListener('mouseleave', function () {
+    renderStars(parseInt(ratingInput.value, 10) || 0);
+  });
+
+  // Submit : état chargement + validation basique
+  var reviewForm = document.getElementById('review-form');
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', function (e) {
+      if (!ratingInput.value) {
+        e.preventDefault();
+        starLabel.textContent = '⚠ Veuillez sélectionner une note';
+        starLabel.style.color = '#EF4444';
+        return;
+      }
+      submitBtn.disabled    = true;
+      submitBtn.innerHTML   = '<i class="fa-solid fa-circle-notch fa-spin"></i> Envoi…';
+    });
+  }
+
+</script>
+
+<style>
+  .review-label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: rgba(10,10,10,.6);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: .4rem;
+  }
+  .review-input {
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #E8E8E8;
+    padding: .7rem 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: .875rem;
+    color: #0D0D0D;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .review-input:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  }
+  .review-input::placeholder { color: rgba(13,13,13,.3); }
+</style>
+{% endblock %}

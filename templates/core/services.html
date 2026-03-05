@@ -1,0 +1,154 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Nos Services – AutoKlik Garage Yaoundé{% endblock %}
+{% block meta_description %}Découvrez tous les services proposés par AutoKlik : vidange, freinage, climatisation, diagnostic et bien plus. Garage automobile à Yaoundé.{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     PAGE HEADER
+══════════════════════════════════════ -->
+<section class="bg-coal-2 pt-16 pb-14 border-b border-white/8">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs text-white/30 mb-8">
+      <a href="{% url 'index' %}" class="hover:text-white transition-colors">Accueil</a>
+      <i class="fa-solid fa-chevron-right text-[9px]"></i>
+      <span class="text-white/55">Services</span>
+    </nav>
+
+    <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">Ce que nous proposons</span>
+    <h1 class="font-display text-white text-7xl sm:text-8xl tracking-wide mt-2 leading-none">
+      Nos Services
+    </h1>
+    <p class="text-white/45 text-base font-light mt-5 max-w-xl leading-relaxed">
+      De l'entretien courant aux réparations complexes, notre équipe prend en charge votre véhicule avec sérieux et transparence.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SERVICES LIST
+══════════════════════════════════════ -->
+<section class="py-20 bg-smoke">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    {% if services %}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% for service in services %}
+      <div class="service-card bg-white border border-smoke-2 hover:shadow-lg hover:border-blue/20 transition-all duration-200 group">
+
+        <!-- Image -->
+        <div class="aspect-video overflow-hidden bg-smoke">
+          {% if service.image %}
+          <img src="{{ service.image.url }}" alt="{{ service.name }}"
+               class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+          {% else %}
+          <div class="w-full h-full flex items-center justify-center bg-coal/5">
+            <i class="fa-solid fa-wrench text-coal/20 text-4xl"></i>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Body -->
+        <div class="p-7">
+          <h2 class="font-display text-coal text-3xl tracking-wide mb-3 group-hover:text-blue transition-colors">
+            {{ service.name }}
+          </h2>
+          <p class="text-coal/55 text-sm leading-relaxed mb-5">
+            {{ service.description }}
+          </p>
+
+          {% if service.price_display %}
+          <div class="flex items-center gap-2 mb-6">
+            <i class="fa-solid fa-tag text-blue text-xs"></i>
+            <span class="text-blue text-sm font-semibold">{{ service.price_display }}</span>
+          </div>
+          {% endif %}
+
+          <a href="{% url 'appointment_request' %}?service={{ service.id }}"
+             class="inline-flex items-center gap-2.5 bg-blue hover:bg-blue-dark text-white font-semibold text-sm px-6 py-3 transition-colors duration-150">
+            <i class="fa-regular fa-calendar-check"></i>
+            Prendre RDV
+          </a>
+        </div>
+
+        <!-- Bottom accent -->
+        <div class="h-[3px] bg-blue scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+
+    <!-- Empty state -->
+    <div class="flex flex-col items-center justify-center py-28 text-center">
+      <span class="w-16 h-16 bg-coal/5 flex items-center justify-center mb-6">
+        <i class="fa-solid fa-wrench text-coal/25 text-2xl"></i>
+      </span>
+      <p class="font-display text-coal text-4xl tracking-wide mb-3">Aucun service disponible</p>
+      <p class="text-coal/45 text-sm max-w-xs">Les services seront bientôt ajoutés par l'équipe AutoKlik.</p>
+    </div>
+
+    {% endif %}
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CTA BOTTOM
+══════════════════════════════════════ -->
+<section class="bg-coal py-20 border-t border-white/8">
+  <div class="max-w-4xl mx-auto px-6 lg:px-10 text-center">
+    <h2 class="font-display text-white text-6xl sm:text-7xl tracking-wide leading-none mb-5">
+      Vous ne trouvez pas <span class="text-blue">votre besoin ?</span>
+    </h2>
+    <p class="text-white/50 text-base font-light mb-10 max-w-lg mx-auto leading-relaxed">
+      Contactez-nous directement. Nos techniciens étudient chaque cas et vous répondent rapidement.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="{% url 'contact' %}"
+         class="inline-flex items-center gap-2.5 bg-blue hover:bg-blue-dark text-white font-semibold text-base px-8 py-4 transition-colors duration-150">
+        <i class="fa-solid fa-envelope"></i>
+        Nous contacter
+      </a>
+      <a href="tel:+237600000000"
+         class="inline-flex items-center gap-2.5 border border-white/25 hover:border-white/60 text-white/70 hover:text-white font-medium text-base px-8 py-4 transition-all duration-150">
+        <i class="fa-solid fa-phone"></i>
+        Nous appeler
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // Scroll reveal
+  var cards = document.querySelectorAll('.service-card');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity   = '1';
+        entry.target.style.transform = 'translateY(0)';
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  cards.forEach(function (el, i) {
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateY(18px)';
+    el.style.transition = 'opacity .45s ease ' + (i % 3 * 80) + 'ms, transform .45s ease ' + (i % 3 * 80) + 'ms';
+    io.observe(el);
+  });
+</script>
+{% endblock %}

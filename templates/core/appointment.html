@@ -1,0 +1,324 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Prendre Rendez-vous – AutoKlik Garage Yaoundé{% endblock %}
+{% block meta_description %}Réservez votre créneau en ligne chez AutoKlik. Formulaire simple, confirmation immédiate par email.{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     PAGE HEADER
+══════════════════════════════════════ -->
+<section class="bg-coal-2 pt-16 pb-14 border-b border-white/8">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs text-white/30 mb-8">
+      <a href="{% url 'index' %}" class="hover:text-white transition-colors">Accueil</a>
+      <i class="fa-solid fa-chevron-right text-[9px]"></i>
+      <span class="text-white/55">Rendez-vous</span>
+    </nav>
+
+    <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">En ligne · Rapide · Gratuit</span>
+    <h1 class="font-display text-white text-7xl sm:text-8xl tracking-wide mt-2 leading-none">
+      Prendre RDV
+    </h1>
+    <p class="text-white/45 text-base font-light mt-5 max-w-xl leading-relaxed">
+      Remplissez le formulaire ci-dessous. Nous confirmons votre rendez-vous dans les plus brefs délais.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FORM SECTION
+══════════════════════════════════════ -->
+<section class="py-20 bg-smoke">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="grid lg:grid-cols-3 gap-12 items-start">
+
+      <!-- ── FORM (2/3) ── -->
+      <div class="lg:col-span-2">
+        <form method="POST" action="{% url 'appointment_request' %}" novalidate id="rdv-form">
+          {% csrf_token %}
+
+          <!-- ── Bloc 1 : Infos client ── -->
+          <fieldset class="mb-10">
+            <legend class="flex items-center gap-3 mb-7">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-user text-white text-xs"></i>
+              </span>
+              <span class="font-display text-coal text-2xl tracking-wide">Vos informations</span>
+            </legend>
+
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div class="field-group">
+                <label for="name" class="field-label">
+                  Nom complet <span class="text-blue">*</span>
+                </label>
+                <input type="text" id="name" name="name" required
+                       placeholder="Ex : Jean Dupont"
+                       class="field-input" />
+              </div>
+
+              <div class="field-group">
+                <label for="phone" class="field-label">
+                  Téléphone <span class="text-blue">*</span>
+                </label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-coal/35">
+                    <i class="fa-solid fa-phone text-sm"></i>
+                  </span>
+                  <input type="tel" id="phone" name="phone" required
+                         placeholder="+237 6XX XXX XXX"
+                         class="field-input pl-10" />
+                </div>
+              </div>
+
+              <div class="field-group sm:col-span-2">
+                <label for="email" class="field-label">
+                  Email
+                  <span class="text-coal/35 font-normal text-xs ml-1">(optionnel – pour la confirmation)</span>
+                </label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-coal/35">
+                    <i class="fa-regular fa-envelope text-sm"></i>
+                  </span>
+                  <input type="email" id="email" name="email"
+                         placeholder="votre@email.com"
+                         class="field-input pl-10" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- ── Bloc 2 : Véhicule ── -->
+          <fieldset class="mb-10">
+            <legend class="flex items-center gap-3 mb-7">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-car text-white text-xs"></i>
+              </span>
+              <span class="font-display text-coal text-2xl tracking-wide">Votre véhicule</span>
+            </legend>
+
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div class="field-group">
+                <label for="brand" class="field-label">
+                  Marque <span class="text-blue">*</span>
+                </label>
+                <input type="text" id="brand" name="brand" required
+                       placeholder="Ex : Toyota, Peugeot…"
+                       class="field-input" />
+              </div>
+
+              <div class="field-group">
+                <label for="model" class="field-label">
+                  Modèle <span class="text-blue">*</span>
+                </label>
+                <input type="text" id="model" name="model" required
+                       placeholder="Ex : Corolla, 308…"
+                       class="field-input" />
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- ── Bloc 3 : Intervention ── -->
+          <fieldset class="mb-10">
+            <legend class="flex items-center gap-3 mb-7">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-wrench text-white text-xs"></i>
+              </span>
+              <span class="font-display text-coal text-2xl tracking-wide">L'intervention</span>
+            </legend>
+
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div class="field-group">
+                <label for="service" class="field-label">
+                  Service souhaité <span class="text-blue">*</span>
+                </label>
+                <div class="relative">
+                  <select id="service" name="service" required class="field-input appearance-none pr-10">
+                    <option value="" disabled selected>Choisir un service…</option>
+                    {% for service in services %}
+                    <option value="{{ service.id }}"
+                            {% if request.GET.service == service.id|stringformat:"s" %}selected{% endif %}>
+                      {{ service.name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-coal/40">
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="date" class="field-label">
+                  Date et heure souhaitées <span class="text-blue">*</span>
+                </label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-coal/35 pointer-events-none">
+                    <i class="fa-regular fa-calendar text-sm"></i>
+                  </span>
+                  <input type="datetime-local" id="date" name="date" required
+                         class="field-input pl-10" />
+                </div>
+              </div>
+
+              <div class="field-group sm:col-span-2">
+                <label for="message" class="field-label">
+                  Description du problème
+                  <span class="text-coal/35 font-normal text-xs ml-1">(optionnel)</span>
+                </label>
+                <textarea id="message" name="message" rows="4"
+                          placeholder="Décrivez brièvement la panne ou l'intervention souhaitée…"
+                          class="field-input resize-none"></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- ── Submit ── -->
+          <div class="flex items-center justify-between flex-wrap gap-4 pt-2">
+            <p class="text-coal/40 text-xs">
+              <i class="fa-solid fa-lock text-blue mr-1.5"></i>
+              Vos données sont confidentielles et ne seront pas partagées.
+            </p>
+            <button type="submit"
+                    class="inline-flex items-center gap-2.5 bg-blue hover:bg-blue-dark text-white font-semibold text-base px-9 py-4 transition-colors duration-150 disabled:opacity-60"
+                    id="submit-btn">
+              <i class="fa-regular fa-calendar-check"></i>
+              Envoyer ma demande
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+
+      <!-- ── SIDEBAR (1/3) ── -->
+      <aside class="space-y-5">
+
+        <!-- Infos pratiques -->
+        <div class="bg-coal-2 p-7">
+          <h3 class="font-display text-white text-2xl tracking-wide mb-6">Infos pratiques</h3>
+          <ul class="space-y-5">
+            <li class="flex items-start gap-4">
+              <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-location-dot text-blue text-sm"></i>
+              </span>
+              <div>
+                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Adresse</p>
+                <p class="text-white/70 text-sm leading-relaxed">
+                  {% if settings %}{{ settings.address }}{% else %}Yaoundé, Cameroun{% endif %}
+                </p>
+              </div>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-regular fa-clock text-blue text-sm"></i>
+              </span>
+              <div>
+                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Horaires</p>
+                <p class="text-white/70 text-sm leading-relaxed">
+                  {% if settings %}{{ settings.opening_hours }}{% else %}Lun – Sam : 7h – 18h{% endif %}
+                </p>
+              </div>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-phone text-blue text-sm"></i>
+              </span>
+              <div>
+                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Téléphone</p>
+                <a href="tel:{% if settings %}{{ settings.phone }}{% else %}+237600000000{% endif %}"
+                   class="text-white/70 hover:text-blue text-sm transition-colors">
+                  {% if settings %}{{ settings.phone }}{% else %}+237 6XX XXX XXX{% endif %}
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Ce qui se passe ensuite -->
+        <div class="bg-white border border-smoke-2 p-7">
+          <h3 class="font-display text-coal text-2xl tracking-wide mb-6">Ce qui se passe ensuite</h3>
+          <ol class="space-y-5">
+            <li class="flex items-start gap-4">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-display text-base">1</span>
+              <p class="text-coal/60 text-sm leading-relaxed">Vous soumettez votre demande via ce formulaire.</p>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-display text-base">2</span>
+              <p class="text-coal/60 text-sm leading-relaxed">Notre équipe étudie votre demande et confirme le créneau.</p>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-display text-base">3</span>
+              <p class="text-coal/60 text-sm leading-relaxed">Vous recevez une confirmation par email (si renseigné) ou par téléphone.</p>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0 mt-0.5 text-white font-display text-base">4</span>
+              <p class="text-coal/60 text-sm leading-relaxed">Vous venez à l'heure convenue. Nous nous occupons du reste.</p>
+            </li>
+          </ol>
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<style>
+  .field-label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: rgba(13,13,13,.65);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: .45rem;
+  }
+  .field-input {
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #E8E8E8;
+    padding: .75rem 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: .875rem;
+    color: #0D0D0D;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .field-input:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+  }
+  .field-input::placeholder { color: rgba(13,13,13,.3); }
+  .field-input option { color: #0D0D0D; }
+</style>
+
+<script>
+  // Set datetime min to now
+  var dateInput = document.getElementById('date');
+  if (dateInput) {
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    dateInput.min = now.toISOString().slice(0, 16);
+  }
+
+  // Submit button loading state
+  var form      = document.getElementById('rdv-form');
+  var submitBtn = document.getElementById('submit-btn');
+  if (form && submitBtn) {
+    form.addEventListener('submit', function () {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours…';
+    });
+  }
+</script>
+{% endblock %}

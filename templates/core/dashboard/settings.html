@@ -1,0 +1,262 @@
+{% extends 'core/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Paramètres – AutoKlik Dashboard{% endblock %}
+{% block page_title %}Paramètres du garage{% endblock %}
+
+{% block content %}
+
+<form method="POST" action="{% url 'garage_settings' %}" novalidate id="settings-form">
+  {% csrf_token %}
+
+  <div class="grid lg:grid-cols-3 gap-6 items-start">
+
+    {# ══════════════════════════════════
+       Colonne principale (2/3)
+    ══════════════════════════════════ #}
+    <div class="lg:col-span-2 space-y-5">
+
+      {# ── Identité du garage ── #}
+      <div class="bg-white border border-surface-border">
+        <div class="px-6 py-5 border-b border-surface-border flex items-center gap-3">
+          <span class="w-7 h-7 bg-blue/10 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-store text-blue text-xs"></i>
+          </span>
+          <h2 class="font-display text-ink text-2xl tracking-wide">Identité du garage</h2>
+        </div>
+        <div class="px-6 py-6 grid sm:grid-cols-2 gap-5">
+
+          <div class="sm:col-span-2">
+            <label for="name" class="field-label">
+              Nom du garage <span class="text-blue">*</span>
+            </label>
+            <input type="text" id="name" name="name" required
+                   value="{% if settings %}{{ settings.garage_name }}{% endif %}"
+                   placeholder="Ex : AutoKlik"
+                   class="field-input" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="description" class="field-label">
+              Slogan / accroche
+              <span class="text-ink/30 font-normal text-xs ml-1">(optionnel)</span>
+            </label>
+            <input type="text" id="description" name="description"
+                   value="{% if settings %}{{ settings.slogan }}{% endif %}"
+                   placeholder="Ex : Votre partenaire de confiance à Yaoundé"
+                   class="field-input" />
+          </div>
+
+        </div>
+      </div>
+
+      {# ── Coordonnées ── #}
+      <div class="bg-white border border-surface-border">
+        <div class="px-6 py-5 border-b border-surface-border flex items-center gap-3">
+          <span class="w-7 h-7 bg-blue/10 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-address-book text-blue text-xs"></i>
+          </span>
+          <h2 class="font-display text-ink text-2xl tracking-wide">Coordonnées</h2>
+        </div>
+        <div class="px-6 py-6 grid sm:grid-cols-2 gap-5">
+
+          <div>
+            <label for="phone" class="field-label">
+              Téléphone <span class="text-blue">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 pointer-events-none">
+                <i class="fa-solid fa-phone text-xs"></i>
+              </span>
+              <input type="tel" id="phone" name="phone" required
+                     value="{% if settings %}{{ settings.phone }}{% endif %}"
+                     placeholder="+237 6XX XXX XXX"
+                     class="field-input pl-8" />
+            </div>
+          </div>
+
+          <div>
+            <label for="email" class="field-label">
+              Email <span class="text-blue">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 pointer-events-none">
+                <i class="fa-regular fa-envelope text-xs"></i>
+              </span>
+              <input type="email" id="email" name="email" required
+                     value="{% if settings %}{{ settings.email }}{% endif %}"
+                     placeholder="contact@autoklik.cm"
+                     class="field-input pl-8" />
+            </div>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="address" class="field-label">
+              Adresse complète <span class="text-blue">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-3.5 text-ink/30 pointer-events-none">
+                <i class="fa-solid fa-location-dot text-xs"></i>
+              </span>
+              <textarea id="address" name="address" rows="2" required
+                        placeholder="Ex : Quartier Bastos, Avenue Kennedy, Yaoundé"
+                        class="field-input pl-8 resize-none">{% if settings %}{{ settings.address }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="google_maps_url" class="field-label">
+              Lien Google Maps
+              <span class="text-ink/30 font-normal text-xs ml-1">(optionnel)</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 pointer-events-none">
+                <i class="fa-solid fa-map-location-dot text-xs"></i>
+              </span>
+              <input type="url" id="google_maps_url" name="google_maps_url"
+                     value="{% if settings %}{{ settings.google_maps_url }}{% endif %}"
+                     placeholder="https://maps.google.com/…"
+                     class="field-input pl-8" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {# ── Horaires ── #}
+      <div class="bg-white border border-surface-border">
+        <div class="px-6 py-5 border-b border-surface-border flex items-center gap-3">
+          <span class="w-7 h-7 bg-blue/10 flex items-center justify-center flex-shrink-0">
+            <i class="fa-regular fa-clock text-blue text-xs"></i>
+          </span>
+          <h2 class="font-display text-ink text-2xl tracking-wide">Horaires d'ouverture</h2>
+        </div>
+        <div class="px-6 py-6">
+          <label for="opening_hours" class="field-label">
+            Horaires <span class="text-blue">*</span>
+          </label>
+          <textarea id="opening_hours" name="opening_hours" rows="3" required
+                    placeholder="Ex : Lun – Sam : 7h – 18h&#10;Dimanche : Fermé"
+                    class="field-input resize-none">{% if settings %}{{ settings.opening_hours }}{% endif %}</textarea>
+          <p class="text-ink/30 text-xs mt-2">
+            <i class="fa-solid fa-circle-info text-blue mr-1"></i>
+            Ces horaires s'affichent dans le footer et sur la page contact du site.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+
+    {# ══════════════════════════════════
+       Sidebar (1/3)
+    ══════════════════════════════════ #}
+    <div class="space-y-5">
+
+      {# Bouton de sauvegarde sticky #}
+      <div class="bg-white border border-surface-border px-5 py-5 sticky top-20">
+        <h3 class="font-display text-ink text-xl tracking-wide mb-4">Enregistrer</h3>
+        <p class="text-ink/40 text-xs leading-relaxed mb-5">
+          Les modifications sont appliquées immédiatement sur le site public après sauvegarde.
+        </p>
+        <button type="submit"
+                id="save-btn"
+                class="w-full inline-flex items-center justify-center gap-2 bg-blue hover:bg-blue-dark
+                       text-white font-semibold text-sm py-3 transition-colors duration-150">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Sauvegarder les modifications
+        </button>
+        <a href="{% url 'index' %}" target="_blank"
+           class="mt-3 w-full inline-flex items-center justify-center gap-2 border border-surface-border
+                  text-ink/50 hover:text-ink font-medium text-sm py-2.5 transition-colors">
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+          Voir le site public
+        </a>
+      </div>
+
+      {# Aperçu des infos actuelles #}
+      <div class="bg-coal-2 border border-side-border px-5 py-5">
+        <h3 class="font-display text-white text-xl tracking-wide mb-4">Aperçu actuel</h3>
+        {% if settings %}
+        <ul class="space-y-3 text-sm">
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-store text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+            <span class="text-white/60">{{ settings.garage_name }}</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-phone text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+            <span class="text-white/60">{{ settings.phone }}</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-regular fa-envelope text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+            <span class="text-white/60 break-all">{{ settings.email }}</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-location-dot text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+            <span class="text-white/60">{{ settings.address }}</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-regular fa-clock text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+            <span class="text-white/60 whitespace-pre-line">{{ settings.opening_hours }}</span>
+          </li>
+        </ul>
+        {% else %}
+        <p class="text-white/30 text-xs">Aucun paramètre enregistré pour le moment.</p>
+        {% endif %}
+      </div>
+
+      {# Note info #}
+      <div class="bg-blue/8 border border-blue/20 px-5 py-4">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-circle-info text-blue mt-0.5 flex-shrink-0"></i>
+          <p class="text-ink/60 text-xs leading-relaxed">
+            Ces informations sont affichées sur le site public : footer, page contact et page d'accueil.
+            Maintenez-les à jour pour que vos clients vous retrouvent facilement.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</form>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<style>
+  .field-label {
+    display: block; font-size: .8rem; font-weight: 600;
+    color: rgba(17,24,39,.6); letter-spacing: .04em;
+    text-transform: uppercase; margin-bottom: .4rem;
+  }
+  .field-input {
+    width: 100%; background: #fff;
+    border: 1.5px solid #E5E7EB;
+    padding: .7rem 1rem;
+    font-family: 'Outfit', sans-serif; font-size: .875rem;
+    color: #111827; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field-input:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  }
+  .field-input::placeholder { color: rgba(17,24,39,.3); }
+</style>
+
+<script>
+  // Bouton save : état chargement
+  var form    = document.getElementById('settings-form');
+  var saveBtn = document.getElementById('save-btn');
+
+  if (form && saveBtn) {
+    form.addEventListener('submit', function () {
+      saveBtn.disabled     = true;
+      saveBtn.innerHTML    = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sauvegarde…';
+    });
+  }
+</script>
+{% endblock %}

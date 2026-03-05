@@ -1,0 +1,239 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{% block meta_description %}AutoKlik – Garage automobile professionnel à Yaoundé.{% endblock %}" />
+  <title>{% block title %}AutoKlik – Garage Automobile Yaoundé{% endblock %}</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blue:  { DEFAULT: '#2563EB', dark: '#1D4ED8', light: '#3B82F6' },
+            coal:  { DEFAULT: '#0D0D0D', 2: '#141414', 3: '#1C1C1C', 4: '#252525' },
+            smoke: { DEFAULT: '#F4F4F4', 2: '#E8E8E8' },
+          },
+          fontFamily: {
+            display: ['"Bebas Neue"', 'sans-serif'],
+            body:    ['"Outfit"', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Free 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-white font-body text-coal antialiased">
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━  HEADER  ━━━━━━━━━━━━━━━━━━━━ -->
+  <header id="site-header" class="fixed top-0 left-0 right-0 z-50">
+
+    <!-- Blue stripe top -->
+    <div class="h-[3px] bg-blue"></div>
+
+    <nav id="site-nav" class="bg-coal-2 transition-shadow duration-300">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="flex items-center justify-between h-16">
+
+          <!-- Logo -->
+          <a href="{% url 'index' %}" class="flex items-center gap-3" aria-label="AutoKlik – accueil">
+            <span class="w-8 h-8 bg-blue flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-bolt text-white text-sm"></i>
+            </span>
+            <span class="font-display text-white text-2xl tracking-[.12em]">
+              AUTO<span class="text-blue">KLIK</span>
+            </span>
+          </a>
+
+          <!-- Desktop links -->
+          <ul class="hidden md:flex items-center gap-1">
+            <li>
+              <a href="{% url 'index' %}"
+                 class="nav-link font-body text-sm font-medium px-4 py-2 text-white/55 hover:text-white transition-colors"
+                 data-url="{% url 'index' %}">
+                Accueil
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'service_list' %}"
+                 class="nav-link font-body text-sm font-medium px-4 py-2 text-white/55 hover:text-white transition-colors"
+                 data-url="{% url 'service_list' %}">
+                Services
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'contact' %}"
+                 class="nav-link font-body text-sm font-medium px-4 py-2 text-white/55 hover:text-white transition-colors"
+                 data-url="{% url 'contact' %}">
+                Contact
+              </a>
+            </li>
+          </ul>
+
+          <!-- CTA + burger -->
+          <div class="flex items-center gap-4">
+            <a href="{% url 'appointment_request' %}"
+               class="hidden md:inline-flex items-center gap-2 bg-blue hover:bg-blue-dark
+                      text-white font-body font-semibold text-sm px-5 py-2.5
+                      transition-colors duration-150">
+              <i class="fa-regular fa-calendar-check"></i>
+              Prendre RDV
+            </a>
+            <button id="burger-btn"
+                    class="md:hidden w-9 h-9 flex items-center justify-center text-white/70 hover:text-white"
+                    aria-label="Ouvrir le menu">
+              <i id="burger-icon" class="fa-solid fa-bars"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="hidden md:hidden border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-1">
+          <a href="{% url 'index' %}"              class="mobile-link text-sm text-white/60 hover:text-white py-3 border-b border-white/8 transition-colors">Accueil</a>
+          <a href="{% url 'service_list' %}"        class="mobile-link text-sm text-white/60 hover:text-white py-3 border-b border-white/8 transition-colors">Services</a>
+          <a href="{% url 'contact' %}"             class="mobile-link text-sm text-white/60 hover:text-white py-3 transition-colors">Contact</a>
+          <a href="{% url 'appointment_request' %}"
+             class="mt-4 inline-flex items-center gap-2 bg-blue text-white font-semibold text-sm px-5 py-3 self-start">
+            <i class="fa-regular fa-calendar-check"></i>
+            Prendre RDV
+          </a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Header offset -->
+  <div class="h-[67px]"></div>
+
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━  TOASTS  ━━━━━━━━━━━━━━━━━━━━ -->
+  {% if messages %}
+  <div id="toast-container" class="fixed top-24 right-5 z-50 flex flex-col gap-2 w-80 pointer-events-none">
+    {% for message in messages %}
+    <div class="toast pointer-events-auto flex items-start gap-3 bg-coal-3 border-l-4 px-4 py-3 shadow-2xl text-sm">
+      {% if 'success' in message.tags %}
+      <i class="fa-solid fa-circle-check text-green-400 mt-0.5 flex-shrink-0"></i>
+      <p class="text-white/80 flex-1 border-l-green-500">{{ message }}</p>
+      {% else %}
+      <i class="fa-solid fa-circle-info text-blue mt-0.5 flex-shrink-0"></i>
+      <p class="text-white/80 flex-1">{{ message }}</p>
+      {% endif %}
+      <button class="toast-close text-white/30 hover:text-white ml-1 mt-0.5">
+        <i class="fa-solid fa-xmark text-xs"></i>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━  CONTENT  ━━━━━━━━━━━━━━━━━━━━ -->
+  <main>{% block content %}{% endblock %}</main>
+
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━  FOOTER  ━━━━━━━━━━━━━━━━━━━━ -->
+  <footer class="bg-coal border-t border-white/8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-14">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+
+        <!-- Brand -->
+        <div>
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-7 h-7 bg-blue flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-bolt text-white text-xs"></i>
+            </span>
+            <span class="font-display text-white text-xl tracking-[.12em]">AUTO<span class="text-blue">KLIK</span></span>
+          </div>
+          <p class="text-white/40 text-sm leading-relaxed max-w-xs">
+            Entretien et réparation automobile par des techniciens certifiés à Yaoundé depuis plus de 10 ans.
+          </p>
+        </div>
+
+        <!-- Navigation -->
+        <div>
+          <p class="text-white/25 text-[11px] font-semibold tracking-[.2em] uppercase mb-5">Navigation</p>
+          <ul class="space-y-3">
+            <li><a href="{% url 'index' %}"              class="text-white/45 hover:text-blue text-sm transition-colors">Accueil</a></li>
+            <li><a href="{% url 'service_list' %}"        class="text-white/45 hover:text-blue text-sm transition-colors">Nos services</a></li>
+            <li><a href="{% url 'appointment_request' %}" class="text-white/45 hover:text-blue text-sm transition-colors">Prendre RDV</a></li>
+            <li><a href="{% url 'contact' %}"             class="text-white/45 hover:text-blue text-sm transition-colors">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <p class="text-white/25 text-[11px] font-semibold tracking-[.2em] uppercase mb-5">Informations</p>
+          {% if settings %}
+          <ul class="space-y-3 text-sm text-white/45">
+            <li class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+              <span>{{ settings.address }}</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i class="fa-solid fa-phone text-blue w-4 text-center flex-shrink-0"></i>
+              <a href="tel:{{ settings.phone }}" class="hover:text-white transition-colors">{{ settings.phone }}</a>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="fa-regular fa-clock text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+              <span>{{ settings.opening_hours }}</span>
+            </li>
+          </ul>
+          {% else %}
+          <ul class="space-y-3 text-sm text-white/45">
+            <li class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot text-blue w-4 text-center mt-0.5 flex-shrink-0"></i>
+              <span>Yaoundé, Cameroun</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i class="fa-solid fa-phone text-blue w-4 text-center flex-shrink-0"></i>
+              <span>+237 6XX XXX XXX</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i class="fa-regular fa-clock text-blue w-4 text-center flex-shrink-0"></i>
+              <span>Lun – Sam : 7h – 18h</span>
+            </li>
+          </ul>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span class="text-xs text-white/25">© {% now "Y" %} AutoKlik. Tous droits réservés.</span>
+        <span class="text-xs text-white/20 tracking-[.18em] uppercase">Garage Automobile · Yaoundé · CM</span>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━  SCRIPTS  ━━━━━━━━━━━━━━━━━━━━ -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

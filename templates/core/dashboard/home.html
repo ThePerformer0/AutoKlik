@@ -1,0 +1,294 @@
+{% extends 'core/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord – AutoKlik{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block content %}
+
+{# ── Ligne de KPIs ── #}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+  <div class="kpi-card bg-white border border-surface-border p-5">
+    <div class="flex items-start justify-between mb-4">
+      <span class="w-9 h-9 bg-blue/10 flex items-center justify-center">
+        <i class="fa-regular fa-calendar text-blue text-base"></i>
+      </span>
+      <span class="text-xs font-semibold text-ink/30 tracking-wide uppercase">Aujourd'hui</span>
+    </div>
+    <p class="font-display text-ink text-5xl tracking-wide leading-none">{{ today_count }}</p>
+    <p class="text-ink/40 text-xs mt-2">RDV du jour</p>
+  </div>
+
+  <div class="kpi-card bg-white border border-surface-border p-5">
+    <div class="flex items-start justify-between mb-4">
+      <span class="w-9 h-9 bg-yellow-50 flex items-center justify-center">
+        <i class="fa-regular fa-clock text-yellow-500 text-base"></i>
+      </span>
+      <span class="text-xs font-semibold text-ink/30 tracking-wide uppercase">En attente</span>
+    </div>
+    <p class="font-display text-ink text-5xl tracking-wide leading-none">{{ pending_count }}</p>
+    <p class="text-ink/40 text-xs mt-2">RDV à confirmer</p>
+  </div>
+
+  <div class="kpi-card bg-white border border-surface-border p-5">
+    <div class="flex items-start justify-between mb-4">
+      <span class="w-9 h-9 bg-yellow-50 flex items-center justify-center">
+        <i class="fa-regular fa-star text-yellow-500 text-base"></i>
+      </span>
+      <span class="text-xs font-semibold text-ink/30 tracking-wide uppercase">Avis</span>
+    </div>
+    <p class="font-display text-ink text-5xl tracking-wide leading-none">{{ pending_reviews }}</p>
+    <p class="text-ink/40 text-xs mt-2">Avis à valider</p>
+  </div>
+
+  <div class="kpi-card bg-white border border-surface-border p-5">
+    <div class="flex items-start justify-between mb-4">
+      <span class="w-9 h-9 bg-blue/10 flex items-center justify-center">
+        <i class="fa-regular fa-envelope text-blue text-base"></i>
+      </span>
+      <span class="text-xs font-semibold text-ink/30 tracking-wide uppercase">Messages</span>
+    </div>
+    <p class="font-display text-ink text-5xl tracking-wide leading-none">{{ unread_messages }}</p>
+    <p class="text-ink/40 text-xs mt-2">Non lus</p>
+  </div>
+
+</div>
+
+
+{# ── Corps principal : RDV du jour + Activité récente ── #}
+<div class="grid lg:grid-cols-3 gap-6">
+
+  {# ── RDV du jour (2/3) ── #}
+  <div class="lg:col-span-2 bg-white border border-surface-border">
+
+    <div class="flex items-center justify-between px-6 py-4 border-b border-surface-border">
+      <h2 class="font-display text-ink text-2xl tracking-wide">RDV du jour</h2>
+      <a href="{% url 'appointment_manage' %}"
+         class="text-xs text-blue font-semibold hover:underline inline-flex items-center gap-1">
+        Voir tout <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </a>
+    </div>
+
+    {% if today_appointments %}
+    <div class="divide-y divide-surface-border">
+      {% for appt in today_appointments %}
+      <div class="flex items-center gap-4 px-6 py-4 hover:bg-surface transition-colors">
+
+        {# Heure #}
+        <div class="w-14 flex-shrink-0 text-center">
+          <p class="font-display text-ink text-xl leading-none">
+            {{ appt.requested_date|date:"H:i" }}
+          </p>
+        </div>
+
+        {# Séparateur vertical #}
+        <div class="w-px h-10 bg-surface-border flex-shrink-0"></div>
+
+        {# Infos client #}
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-ink text-sm truncate">{{ appt.client_name }}</p>
+          <p class="text-ink/40 text-xs truncate">
+            {{ appt.vehicle_brand }} {{ appt.vehicle_model }}
+            {% if appt.service %} · {{ appt.service.name }}{% endif %}
+          </p>
+        </div>
+
+        {# Statut badge #}
+        <span class="appt-badge appt-badge-{{ appt.status }} flex-shrink-0">
+          {{ appt.get_status_display }}
+        </span>
+
+        {# Actions rapides via HTMX #}
+        <div class="flex items-center gap-2 flex-shrink-0">
+          {% if appt.status == 'pending' %}
+          <form method="POST" action="{% url 'update_appointment_status' appt.pk %}"
+                hx-post="{% url 'update_appointment_status' appt.pk %}"
+                hx-target="#badge-{{ appt.pk }}"
+                hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="confirmed" />
+            <button type="submit"
+                    class="w-7 h-7 bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center transition-colors"
+                    title="Confirmer">
+              <i class="fa-solid fa-check text-xs"></i>
+            </button>
+          </form>
+          <form method="POST" action="{% url 'update_appointment_status' appt.pk %}"
+                hx-post="{% url 'update_appointment_status' appt.pk %}"
+                hx-target="#badge-{{ appt.pk }}"
+                hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="cancelled" />
+            <button type="submit"
+                    class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors"
+                    title="Annuler">
+              <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+          </form>
+          {% endif %}
+          <a href="{% url 'appointment_detail' appt.pk %}"
+             class="w-7 h-7 bg-surface-2 hover:bg-surface-border text-ink/50 hover:text-ink flex items-center justify-center transition-colors"
+             title="Détail">
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-16 text-center px-6">
+      <span class="w-12 h-12 bg-surface-2 flex items-center justify-center mb-4">
+        <i class="fa-regular fa-calendar text-ink/25 text-xl"></i>
+      </span>
+      <p class="font-semibold text-ink/50 text-sm">Aucun rendez-vous aujourd'hui</p>
+      <p class="text-ink/30 text-xs mt-1">Profitez-en pour avancer sur les autres tâches.</p>
+    </div>
+    {% endif %}
+
+  </div>
+
+
+  {# ── Sidebar droite (1/3) ── #}
+  <div class="space-y-5">
+
+    {# Semaine en cours #}
+    <div class="bg-white border border-surface-border">
+      <div class="px-5 py-4 border-b border-surface-border">
+        <h2 class="font-display text-ink text-2xl tracking-wide">Cette semaine</h2>
+      </div>
+      <div class="px-5 py-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-ink/50 text-sm">Total RDV</span>
+          <span class="font-semibold text-ink text-sm">{{ week_count }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-ink/50 text-sm">Confirmés</span>
+          <span class="font-semibold text-green-600 text-sm">{{ week_confirmed }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-ink/50 text-sm">En attente</span>
+          <span class="font-semibold text-yellow-500 text-sm">{{ week_pending }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-ink/50 text-sm">Terminés</span>
+          <span class="font-semibold text-ink/60 text-sm">{{ week_done }}</span>
+        </div>
+        {# Barre de progression visuelle #}
+        <div class="pt-2">
+          <div class="h-1.5 bg-surface-2 w-full">
+            <div class="h-full bg-blue transition-all duration-500"
+                 id="week-progress-bar"
+                 data-done="{{ week_done }}"
+                 data-total="{{ week_count }}"
+                 style="width: 0%"></div>
+          </div>
+          <p class="text-ink/30 text-xs mt-1.5">Taux de complétion</p>
+        </div>
+      </div>
+    </div>
+
+    {# Derniers avis à valider #}
+    <div class="bg-white border border-surface-border">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-surface-border">
+        <h2 class="font-display text-ink text-2xl tracking-wide">Avis récents</h2>
+        <a href="{% url 'review_list' %}" class="text-xs text-blue font-semibold hover:underline">Voir tout</a>
+      </div>
+      {% if recent_reviews %}
+      <div class="divide-y divide-surface-border">
+        {% for review in recent_reviews %}
+        <div class="px-5 py-3.5">
+          <div class="flex items-center justify-between mb-1">
+            <p class="font-semibold text-ink text-sm">{{ review.author_name }}</p>
+            <div class="flex gap-0.5" id="stars-{{ review.pk }}">
+              {# Les étoiles sont colorées via JS pour éviter les conditions dans class #}
+              {% for i in "12345" %}
+              <i class="fa-solid fa-star text-[11px] review-star"
+                 data-review="{{ review.pk }}"
+                 data-index="{{ forloop.counter }}"
+                 data-rating="{{ review.rating }}"></i>
+              {% endfor %}
+            </div>
+          </div>
+          <p class="text-ink/45 text-xs truncate">{{ review.comment }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="px-5 py-8 text-center">
+        <p class="text-ink/35 text-xs">Aucun avis en attente</p>
+      </div>
+      {% endif %}
+    </div>
+
+    {# Derniers messages #}
+    <div class="bg-white border border-surface-border">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-surface-border">
+        <h2 class="font-display text-ink text-2xl tracking-wide">Messages</h2>
+        <a href="{% url 'message_manage' %}" class="text-xs text-blue font-semibold hover:underline">Voir tout</a>
+      </div>
+      {% if recent_messages %}
+      <div class="divide-y divide-surface-border">
+        {% for msg in recent_messages %}
+        <div class="flex items-start gap-3 px-5 py-3.5 unread-row" data-read="{{ msg.is_read|yesno:'true,false' }}">
+          <span class="w-7 h-7 bg-blue flex items-center justify-center text-white font-display text-sm flex-shrink-0 mt-0.5">
+            {{ msg.name|first|upper }}
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-2">
+              <p class="font-semibold text-ink text-xs truncate">{{ msg.name }}</p>
+              <p class="text-ink/30 text-[10px] flex-shrink-0">{{ msg.created_at|date:"d/m" }}</p>
+            </div>
+            <p class="text-ink/45 text-xs truncate mt-0.5">{{ msg.message }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="px-5 py-8 text-center">
+        <p class="text-ink/35 text-xs">Aucun message reçu</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ── Barre progression semaine ──────────────────────
+  var bar = document.getElementById('week-progress-bar');
+  if (bar) {
+    var done  = parseInt(bar.getAttribute('data-done'),  10) || 0;
+    var total = parseInt(bar.getAttribute('data-total'), 10) || 0;
+    var pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+    requestAnimationFrame(function () {
+      bar.style.width = pct + '%';
+    });
+  }
+
+  // ── Étoiles des avis (colorées via JS) ────────────
+  document.querySelectorAll('.review-star').forEach(function (star) {
+    var index  = parseInt(star.getAttribute('data-index'),  10);
+    var rating = parseInt(star.getAttribute('data-rating'), 10);
+    if (index <= rating) {
+      star.classList.add('text-yellow-400');
+    } else {
+      star.classList.add('text-ink/15');
+    }
+  });
+
+  // ── Messages non lus : fond légèrement différent ──
+  document.querySelectorAll('.unread-row').forEach(function (row) {
+    if (row.getAttribute('data-read') === 'false') {
+      row.classList.add('bg-blue/3');
+    }
+  });
+</script>
+{% endblock %}

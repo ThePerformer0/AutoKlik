@@ -1,0 +1,284 @@
+{% extends 'core/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Rendez-vous – AutoKlik Dashboard{% endblock %}
+{% block page_title %}Rendez-vous{% endblock %}
+
+{% block content %}
+
+{# ── Barre d'outils : filtres + compteur ── #}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+
+  <div class="flex items-center gap-3 flex-wrap">
+    {# Filtres statut #}
+    <div class="flex items-center gap-1 bg-white border border-surface-border p-1">
+      <a href="{% url 'appointment_manage' %}"
+         class="filter-btn" data-active="{% if not request.GET.status %}true{% endif %}">
+        Tous
+      </a>
+      <a href="?status=pending"
+         class="filter-btn" data-active="{% if request.GET.status == 'pending' %}true{% endif %}">
+        En attente
+      </a>
+      <a href="?status=confirmed"
+         class="filter-btn" data-active="{% if request.GET.status == 'confirmed' %}true{% endif %}">
+        Confirmés
+      </a>
+      <a href="?status=done"
+         class="filter-btn" data-active="{% if request.GET.status == 'done' %}true{% endif %}">
+        Terminés
+      </a>
+      <a href="?status=cancelled"
+         class="filter-btn" data-active="{% if request.GET.status == 'cancelled' %}true{% endif %}">
+        Annulés
+      </a>
+    </div>
+  </div>
+
+  {# Recherche rapide #}
+  <form method="GET" action="{% url 'appointment_manage' %}" class="flex items-center gap-2">
+    {% if request.GET.status %}
+    <input type="hidden" name="status" value="{{ request.GET.status }}" />
+    {% endif %}
+    <div class="relative">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 pointer-events-none">
+        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+      </span>
+      <input type="text" name="q" value="{{ request.GET.q }}"
+             placeholder="Nom client, véhicule…"
+             class="dash-input pl-8 w-56 text-sm" />
+    </div>
+    <button type="submit"
+            class="dash-btn-primary px-4 py-2 text-sm">
+      Rechercher
+    </button>
+  </form>
+
+</div>
+
+
+{# ── Table ── #}
+<div class="bg-white border border-surface-border overflow-hidden">
+
+  {# Header table #}
+  <div class="hidden lg:grid appt-grid px-6 py-3 bg-surface-2 border-b border-surface-border
+              text-[11px] font-semibold text-ink/35 tracking-[.1em] uppercase">
+    <span>Client</span>
+    <span>Véhicule</span>
+    <span>Service</span>
+    <span>Date souhaitée</span>
+    <span>Statut</span>
+    <span class="text-right">Actions</span>
+  </div>
+
+  {% if appointments %}
+  <div class="divide-y divide-surface-border">
+    {% for appt in appointments %}
+    <div class="appt-row group lg:grid appt-grid px-6 py-4 hover:bg-surface transition-colors items-center gap-4">
+
+      {# Client #}
+      <div class="mb-2 lg:mb-0">
+        <p class="font-semibold text-ink text-sm">{{ appt.client_name }}</p>
+        <a href="tel:{{ appt.client_phone }}"
+           class="text-ink/40 text-xs hover:text-blue transition-colors">
+          <i class="fa-solid fa-phone text-[10px] mr-1"></i>{{ appt.client_phone }}
+        </a>
+      </div>
+
+      {# Véhicule #}
+      <div class="mb-2 lg:mb-0">
+        <p class="text-ink text-sm">{{ appt.vehicle_brand }} {{ appt.vehicle_model }}</p>
+      </div>
+
+      {# Service #}
+      <div class="mb-2 lg:mb-0">
+        {% if appt.service %}
+        <p class="text-ink text-sm">{{ appt.service.name }}</p>
+        {% else %}
+        <span class="text-ink/30 text-xs">—</span>
+        {% endif %}
+      </div>
+
+      {# Date #}
+      <div class="mb-2 lg:mb-0">
+        <p class="text-ink text-sm">{{ appt.requested_date|date:"d/m/Y" }}</p>
+        <p class="text-ink/40 text-xs">{{ appt.requested_date|date:"H:i" }}</p>
+      </div>
+
+      {# Statut #}
+      <div class="mb-3 lg:mb-0">
+        <span id="badge-{{ appt.pk }}" class="appt-badge appt-badge-{{ appt.status }}">
+          {{ appt.get_status_display }}
+        </span>
+      </div>
+
+      {# Actions #}
+      <div class="flex items-center gap-2 lg:justify-end flex-wrap">
+
+        {# Confirmer — visible seulement si pending #}
+        <div class="action-confirm {% if appt.status != 'pending' %}hidden{% endif %}">
+          <form method="POST" action="{% url 'update_appointment_status' appt.pk %}"
+                hx-post="{% url 'update_appointment_status' appt.pk %}"
+                hx-target="#badge-{{ appt.pk }}"
+                hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="confirmed" />
+            <button type="submit" class="dash-action-btn text-green-600 bg-green-50 hover:bg-green-100"
+                    title="Confirmer">
+              <i class="fa-solid fa-check text-xs"></i>
+            </button>
+          </form>
+        </div>
+
+        {# Marquer terminé — visible si confirmed #}
+        <div class="action-done {% if appt.status != 'confirmed' %}hidden{% endif %}">
+          <form method="POST" action="{% url 'update_appointment_status' appt.pk %}"
+                hx-post="{% url 'update_appointment_status' appt.pk %}"
+                hx-target="#badge-{{ appt.pk }}"
+                hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="done" />
+            <button type="submit" class="dash-action-btn text-ink/60 bg-surface-2 hover:bg-surface-border"
+                    title="Marquer terminé">
+              <i class="fa-solid fa-flag-checkered text-xs"></i>
+            </button>
+          </form>
+        </div>
+
+        {# Annuler — visible si pending ou confirmed #}
+        <div class="action-cancel {% if appt.status == 'cancelled' or appt.status == 'done' %}hidden{% endif %}">
+          <form method="POST" action="{% url 'update_appointment_status' appt.pk %}"
+                hx-post="{% url 'update_appointment_status' appt.pk %}"
+                hx-target="#badge-{{ appt.pk }}"
+                hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="cancelled" />
+            <button type="submit" class="dash-action-btn text-red-500 bg-red-50 hover:bg-red-100"
+                    title="Annuler">
+              <i class="fa-solid fa-ban text-xs"></i>
+            </button>
+          </form>
+        </div>
+
+        {# Détail #}
+        <a href="{% url 'appointment_detail' appt.pk %}"
+           class="dash-action-btn text-blue bg-blue/8 hover:bg-blue/15"
+           title="Voir le détail">
+          <i class="fa-solid fa-eye text-xs"></i>
+        </a>
+
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {# Pagination #}
+  {% if appointments.has_other_pages %}
+  <div class="flex items-center justify-between px-6 py-4 border-t border-surface-border">
+    <p class="text-xs text-ink/40">
+      Page {{ appointments.number }} sur {{ appointments.paginator.num_pages }}
+    </p>
+    <div class="flex items-center gap-1">
+      {% if appointments.has_previous %}
+      <a href="?page={{ appointments.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="dash-page-btn">
+        <i class="fa-solid fa-chevron-left text-xs"></i>
+      </a>
+      {% endif %}
+      {% for num in appointments.paginator.page_range %}
+      <a href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="dash-page-btn page-num" data-current="{{ appointments.number }}" data-page="{{ num }}">
+        {{ num }}
+      </a>
+      {% endfor %}
+      {% if appointments.has_next %}
+      <a href="?page={{ appointments.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="dash-page-btn">
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="flex flex-col items-center justify-center py-20 text-center">
+    <span class="w-12 h-12 bg-surface-2 flex items-center justify-center mb-4">
+      <i class="fa-regular fa-calendar text-ink/25 text-xl"></i>
+    </span>
+    <p class="font-semibold text-ink/50 text-sm">Aucun rendez-vous trouvé</p>
+    <p class="text-ink/30 text-xs mt-1">Modifiez vos filtres ou attendez de nouvelles demandes.</p>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<style>
+  .appt-grid {
+    grid-template-columns: 1.8fr 1.2fr 1.2fr 1.2fr 1fr auto;
+    gap: 1rem;
+  }
+  .filter-btn {
+    padding: 5px 12px;
+    font-size: .75rem;
+    font-weight: 600;
+    color: rgba(17,24,39,.45);
+    transition: color .15s, background .15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { color: #111827; background: #F3F4F6; }
+  .filter-btn[data-active="true"] { background: #2563EB; color: #fff; }
+
+  .dash-input {
+    border: 1.5px solid #E5E7EB;
+    padding: 7px 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: .8125rem;
+    color: #111827;
+    outline: none;
+    transition: border-color .15s;
+    background: #fff;
+  }
+  .dash-input:focus { border-color: #2563EB; }
+  .dash-input::placeholder { color: rgba(17,24,39,.3); }
+
+  .dash-btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #2563EB; color: #fff;
+    font-family: 'Outfit', sans-serif; font-weight: 600;
+    transition: background .15s;
+  }
+  .dash-btn-primary:hover { background: #1D4ED8; }
+
+  .dash-action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px;
+    transition: background .15s;
+  }
+  .dash-page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 28px; height: 28px; padding: 0 6px;
+    font-size: .75rem; font-weight: 600;
+    border: 1px solid #E5E7EB;
+    color: rgba(17,24,39,.5);
+    background: #fff;
+    transition: border-color .15s, color .15s;
+  }
+  .dash-page-btn:hover { border-color: #2563EB; color: #2563EB; }
+  .dash-page-btn.current { background: #2563EB; color: #fff; border-color: #2563EB; }
+</style>
+
+<script>
+  // Pagination : marquer la page courante
+  document.querySelectorAll('.page-num').forEach(function (btn) {
+    if (btn.getAttribute('data-page') === btn.getAttribute('data-current')) {
+      btn.classList.add('current');
+    }
+  });
+</script>
+{% endblock %}

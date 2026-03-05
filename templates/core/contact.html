@@ -1,0 +1,237 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Contact – AutoKlik Garage Yaoundé{% endblock %}
+{% block meta_description %}Contactez AutoKlik, garage automobile à Yaoundé. Formulaire en ligne, téléphone, adresse.
+Nous répondons rapidement.{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     PAGE HEADER
+══════════════════════════════════════ -->
+<section class="bg-coal-2 pt-16 pb-14 border-b border-white/8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-xs text-white/30 mb-8">
+            <a href="{% url 'index' %}" class="hover:text-white transition-colors">Accueil</a>
+            <i class="fa-solid fa-chevron-right text-[9px]"></i>
+            <span class="text-white/55">Contact</span>
+        </nav>
+
+        <span class="text-blue text-xs font-semibold tracking-[.22em] uppercase">On vous répond vite</span>
+        <h1 class="font-display text-white text-7xl sm:text-8xl tracking-wide mt-2 leading-none">
+            Contactez-Nous
+        </h1>
+        <p class="text-white/45 text-base font-light mt-5 max-w-xl leading-relaxed">
+            Une question, une demande particulière ou un devis à obtenir ? Écrivez-nous, nous vous répondons sous 24h.
+        </p>
+
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CONTACT SECTION
+══════════════════════════════════════ -->
+<section class="py-20 bg-smoke">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="grid lg:grid-cols-3 gap-12 items-start">
+
+            <!-- ── FORM (2/3) ── -->
+            <div class="lg:col-span-2">
+
+                <form method="POST" action="{% url 'contact' %}" novalidate id="contact-form">
+                    {% csrf_token %}
+
+                    <div class="grid sm:grid-cols-2 gap-5 mb-5">
+                        <div>
+                            <label for="name" class="field-label">
+                                Nom complet <span class="text-blue">*</span>
+                            </label>
+                            <input type="text" id="name" name="name" required placeholder="Ex : Marie Nguemo"
+                                class="field-input" />
+                        </div>
+
+                        <div>
+                            <label for="email" class="field-label">
+                                Adresse email <span class="text-blue">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-coal/35 pointer-events-none">
+                                    <i class="fa-regular fa-envelope text-sm"></i>
+                                </span>
+                                <input type="email" id="email" name="email" required placeholder="votre@email.com"
+                                    class="field-input pl-10" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-7">
+                        <label for="message" class="field-label">
+                            Votre message <span class="text-blue">*</span>
+                        </label>
+                        <textarea id="message" name="message" rows="7" required
+                            placeholder="Décrivez votre demande, posez vos questions…"
+                            class="field-input resize-none"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between flex-wrap gap-4">
+                        <p class="text-coal/40 text-xs">
+                            <i class="fa-solid fa-lock text-blue mr-1.5"></i>
+                            Vos données restent confidentielles.
+                        </p>
+                        <button type="submit" id="contact-submit"
+                            class="inline-flex items-center gap-2.5 bg-blue hover:bg-blue-dark text-white font-semibold text-base px-9 py-4 transition-colors duration-150 disabled:opacity-60">
+                            <i class="fa-regular fa-paper-plane"></i>
+                            Envoyer le message
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <!-- ── SIDEBAR (1/3) ── -->
+            <aside class="space-y-5">
+
+                <!-- Coordonnées -->
+                <div class="bg-coal-2 p-7">
+                    <h3 class="font-display text-white text-2xl tracking-wide mb-6">Nos coordonnées</h3>
+                    <ul class="space-y-6">
+                        <li class="flex items-start gap-4">
+                            <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-solid fa-location-dot text-blue text-sm"></i>
+                            </span>
+                            <div>
+                                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Adresse</p>
+                                <p class="text-white/70 text-sm leading-relaxed">
+                                    {% if settings %}{{ settings.address }}{% else %}Yaoundé, Cameroun{% endif %}
+                                </p>
+                                {% if settings and settings.google_maps_url %}
+                                <a href="{{ settings.google_maps_url }}" target="_blank" rel="noopener"
+                                    class="inline-flex items-center gap-1.5 text-blue text-xs font-semibold mt-2 hover:underline">
+                                    <i class="fa-solid fa-map-location-dot text-xs"></i>
+                                    Voir sur Google Maps
+                                </a>
+                                {% endif %}
+                            </div>
+                        </li>
+
+                        <li class="flex items-start gap-4">
+                            <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-solid fa-phone text-blue text-sm"></i>
+                            </span>
+                            <div>
+                                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Téléphone</p>
+                                <a href="tel:{% if settings %}{{ settings.phone }}{% else %}+237600000000{% endif %}"
+                                    class="text-white/70 hover:text-blue text-sm transition-colors">
+                                    {% if settings %}{{ settings.phone }}{% else %}+237 6XX XXX XXX{% endif %}
+                                </a>
+                            </div>
+                        </li>
+
+                        <li class="flex items-start gap-4">
+                            <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-regular fa-envelope text-blue text-sm"></i>
+                            </span>
+                            <div>
+                                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Email</p>
+                                {% if settings %}
+                                <a href="mailto:{{ settings.email }}"
+                                    class="text-white/70 hover:text-blue text-sm transition-colors break-all">
+                                    {{ settings.email }}
+                                </a>
+                                {% else %}
+                                <span class="text-white/70 text-sm">contact@autoklik.cm</span>
+                                {% endif %}
+                            </div>
+                        </li>
+
+                        <li class="flex items-start gap-4">
+                            <span class="w-8 h-8 bg-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-regular fa-clock text-blue text-sm"></i>
+                            </span>
+                            <div>
+                                <p class="text-white/30 text-xs tracking-widest uppercase mb-1">Horaires</p>
+                                <p class="text-white/70 text-sm leading-relaxed">
+                                    {% if settings %}{{ settings.opening_hours }}{% else %}Lun – Sam : 7h – 18h{% endif %}
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- RDV shortcut -->
+                <div class="bg-blue p-7">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fa-regular fa-calendar-check text-white text-xl"></i>
+                        <h3 class="font-display text-white text-2xl tracking-wide">Besoin d'un RDV ?</h3>
+                    </div>
+                    <p class="text-white/65 text-sm leading-relaxed mb-5">
+                        Si vous souhaitez directement réserver un créneau pour votre véhicule, utilisez notre formulaire
+                        dédié.
+                    </p>
+                    <a href="{% url 'appointment_request' %}"
+                        class="inline-flex items-center gap-2 bg-white text-blue font-semibold text-sm px-5 py-3 hover:bg-smoke transition-colors duration-150">
+                        Prendre rendez-vous
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+            </aside>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<style>
+    .field-label {
+        display: block;
+        font-size: .8rem;
+        font-weight: 600;
+        color: rgba(13, 13, 13, .65);
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        margin-bottom: .45rem;
+    }
+
+    .field-input {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #E8E8E8;
+        padding: .75rem 1rem;
+        font-family: 'Outfit', sans-serif;
+        font-size: .875rem;
+        color: #0D0D0D;
+        outline: none;
+        transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .field-input:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .field-input::placeholder {
+        color: rgba(13, 13, 13, .3);
+    }
+</style>
+
+<script>
+    // Submit loading state
+    var form = document.getElementById('contact-form');
+    var btn = document.getElementById('contact-submit');
+    if (form && btn) {
+        form.addEventListener('submit', function () {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours…';
+        });
+    }
+</script>
+{% endblock %}

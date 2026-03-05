@@ -1,0 +1,123 @@
+{% extends 'core/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Détail RDV #{{ appt.id }} – AutoKlik{% endblock %}
+{% block page_title %}Détail du rendez-vous{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto">
+
+    {# Fil d'ariane #}
+    <nav class="flex items-center gap-2 text-xs text-ink/30 mb-6 font-semibold uppercase tracking-wider">
+        <a href="{% url 'dashboard_home' %}" class="hover:text-blue">Admin</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <a href="{% url 'appointment_manage' %}" class="hover:text-blue">Rendez-vous</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-ink/60">RDV #{{ appt.id }}</span>
+    </nav>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+
+        {# ── Colonne Gauche : Infos (2/3) ── #}
+        <div class="lg:col-span-2 space-y-6">
+
+            {# Carte client & véhicule #}
+            <div class="bg-white border border-surface-border p-8">
+                <h2 class="font-display text-ink text-3xl tracking-wide mb-6 border-b border-surface-border pb-2">
+                    Informations Générales</h2>
+
+                <div class="grid sm:grid-cols-2 gap-8">
+                    {# Client #}
+                    <div>
+                        <p class="text-[10px] font-bold text-ink/25 uppercase tracking-widest mb-3">Client</p>
+                        <p class="font-semibold text-ink text-lg">{{ appt.client_name }}</p>
+                        <div class="mt-4 space-y-2">
+                            <a href="tel:{{ appt.client_phone }}"
+                                class="flex items-center gap-2 text-sm text-blue hover:underline">
+                                <i class="fa-solid fa-phone text-xs"></i> {{ appt.client_phone }}
+                            </a>
+                            {% if appt.client_email %}
+                            <a href="mailto:{{ appt.client_email }}"
+                                class="flex items-center gap-2 text-sm text-blue hover:underline">
+                                <i class="fa-regular fa-envelope text-xs"></i> {{ appt.client_email }}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Véhicule #}
+                    <div>
+                        <p class="text-[10px] font-bold text-ink/25 uppercase tracking-widest mb-3">Véhicule</p>
+                        <p class="font-semibold text-ink text-lg">{{ appt.vehicle_brand }}</p>
+                        <p class="text-ink/60">{{ appt.vehicle_model }}</p>
+                    </div>
+                </div>
+
+                {# Service & Description #}
+                <div class="mt-10 pt-8 border-t border-surface-border">
+                    <p class="text-[10px] font-bold text-ink/25 uppercase tracking-widest mb-3">Service demandé</p>
+                    <div class="bg-surface-2 p-4 border-l-4 border-blue mb-6">
+                        <p class="font-semibold text-ink">{% if appt.service %}{{ appt.service.name }}{% else %}Non
+                            spécifié{% endif %}</p>
+                    </div>
+
+                    <p class="text-[10px] font-bold text-ink/25 uppercase tracking-widest mb-2">Message / Problème
+                        décrit</p>
+                    <p class="text-ink/70 text-sm leading-relaxed whitespace-pre-wrap">
+                        {% if appt.description %}{{ appt.description }}{% else %}Aucune description fournie.{% endif %}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        {# ── Colonne Droite : Statut & Actions (1/3) ── #}
+        <div class="space-y-6">
+
+            {# Statut actuel #}
+            <div class="bg-white border border-surface-border p-6 text-center">
+                <p class="text-[10px] font-bold text-ink/25 uppercase tracking-widest mb-4">Statut actuel</p>
+                <span class="appt-badge appt-badge-{{ appt.status }} text-sm py-1.5 px-4 mb-4">
+                    {{ appt.get_status_display }}
+                </span>
+                <p class="text-[10px] text-ink/30 mt-4 leading-relaxed italic">
+                    Créé le {{ appt.created_at|date:"d/m/Y à H:i" }}
+                </p>
+            </div>
+
+            {# Actions rapides #}
+            <div class="bg-white border border-surface-border p-6 font-body">
+                <h3 class="font-display text-ink text-xl tracking-wide mb-4">Actions</h3>
+
+                <form method="POST" action="{% url 'update_appointment_status' appt.pk %}" class="space-y-3">
+                    {% csrf_token %}
+                    <label class="block text-[11px] font-semibold text-ink/40 uppercase mb-1">Changer le statut</pac-7>
+                        <select name="status"
+                            class="w-full bg-surface-2 border border-surface-border p-2 text-sm outline-none focus:border-blue">
+                            {% for code, label in appt.STATUS_CHOICES %}
+                            <option value="{{ code }}" {% if appt.status == code %}selected{% endif %}>{{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit"
+                            class="w-full bg-side hover:bg-black text-white text-xs font-bold py-3 transition-colors uppercase tracking-widest">
+                            Sauvegarder
+                        </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-surface-border">
+                    <a href="tel:{{ appt.client_phone }}"
+                        class="flex items-center justify-center gap-2 w-full border border-surface-border hover:bg-surface-2 py-3 text-xs font-bold transition-colors uppercase tracking-widest">
+                        <i class="fa-solid fa-phone"></i> Appeler
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

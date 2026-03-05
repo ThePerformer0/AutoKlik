@@ -1,0 +1,274 @@
+{% extends 'core/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Messages – AutoKlik Dashboard{% endblock %}
+{% block page_title %}Messages de contact{% endblock %}
+
+{% block content %}
+
+{# ── KPIs ── #}
+<div class="grid grid-cols-2 gap-4 mb-6 w-fit">
+  <div class="bg-white border border-surface-border px-5 py-4 flex items-center gap-4">
+    <span class="w-9 h-9 bg-blue/10 flex items-center justify-center flex-shrink-0">
+      <i class="fa-regular fa-envelope text-blue"></i>
+    </span>
+    <div>
+      <p class="font-display text-ink text-3xl leading-none">{{ messages|length }}</p>
+      <p class="text-ink/40 text-xs mt-1">Total messages</p>
+    </div>
+  </div>
+  <div class="bg-white border border-surface-border px-5 py-4 flex items-center gap-4">
+    <span class="w-9 h-9 bg-blue/10 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-envelope text-blue"></i>
+    </span>
+    <div>
+      <p class="font-display text-ink text-3xl leading-none" id="unread-count">0</p>
+      <p class="text-ink/40 text-xs mt-1">Non lus</p>
+    </div>
+  </div>
+</div>
+
+{# ── Filtre lu/non lu ── #}
+<div class="flex items-center gap-1 bg-white border border-surface-border p-1 w-fit mb-6">
+  <a href="{% url 'message_manage' %}"
+     class="filter-btn" data-active="{% if not request.GET.filter %}true{% endif %}">
+    Tous
+  </a>
+  <a href="?filter=unread"
+     class="filter-btn" data-active="{% if request.GET.filter == 'unread' %}true{% endif %}">
+    Non lus
+  </a>
+  <a href="?filter=read"
+     class="filter-btn" data-active="{% if request.GET.filter == 'read' %}true{% endif %}">
+    Lus
+  </a>
+</div>
+
+
+{# ── Layout 2 colonnes : liste + panneau de lecture ── #}
+<div class="grid lg:grid-cols-5 gap-5 items-start">
+
+  {# ── Liste messages (2/5) ── #}
+  <div class="lg:col-span-2 bg-white border border-surface-border overflow-hidden">
+
+    {% if messages %}
+    <div class="divide-y divide-surface-border" id="message-list">
+      {% for msg in messages %}
+      <button type="button"
+              class="msg-row w-full text-left flex items-start gap-3 px-4 py-4
+                     hover:bg-surface transition-colors"
+              data-id="{{ msg.pk }}"
+              data-read="{{ msg.is_read|yesno:'true,false' }}"
+              data-name="{{ msg.name }}"
+              data-email="{{ msg.email }}"
+              data-date="{{ msg.created_at|date:'d/m/Y à H:i' }}"
+              data-message="{{ msg.message }}"
+              onclick="openMessage(this)">
+
+        {# Avatar #}
+        <span class="w-8 h-8 bg-blue flex items-center justify-center text-white font-display text-sm flex-shrink-0 mt-0.5">
+          {{ msg.name|first|upper }}
+        </span>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2 mb-0.5">
+            <p class="font-semibold text-ink text-sm truncate msg-name-label">{{ msg.name }}</p>
+            <p class="text-ink/30 text-[10px] flex-shrink-0">{{ msg.created_at|date:"d/m" }}</p>
+          </div>
+          <p class="text-ink/50 text-xs truncate">{{ msg.message }}</p>
+        </div>
+
+        {# Indicateur non lu #}
+        <span class="unread-dot w-2 h-2 bg-blue rounded-full flex-shrink-0 mt-2
+                     {% if msg.is_read %}invisible{% endif %}"></span>
+
+      </button>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-20 text-center px-6">
+      <span class="w-12 h-12 bg-surface-2 flex items-center justify-center mb-4">
+        <i class="fa-regular fa-envelope text-ink/25 text-xl"></i>
+      </span>
+      <p class="font-semibold text-ink/50 text-sm">Aucun message reçu</p>
+    </div>
+    {% endif %}
+
+  </div>
+
+
+  {# ── Panneau de lecture (3/5) ── #}
+  <div class="lg:col-span-3 bg-white border border-surface-border" id="message-panel">
+
+    {# État vide (par défaut) #}
+    <div id="panel-empty" class="flex flex-col items-center justify-center py-24 text-center px-6">
+      <span class="w-12 h-12 bg-surface-2 flex items-center justify-center mb-4">
+        <i class="fa-regular fa-envelope-open text-ink/25 text-xl"></i>
+      </span>
+      <p class="font-semibold text-ink/40 text-sm">Sélectionnez un message</p>
+      <p class="text-ink/25 text-xs mt-1">Cliquez sur un message dans la liste pour le lire.</p>
+    </div>
+
+    {# Contenu du message sélectionné #}
+    <div id="panel-content" class="hidden flex flex-col h-full">
+
+      {# Header panneau #}
+      <div class="px-6 py-5 border-b border-surface-border">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span id="panel-avatar"
+                  class="w-10 h-10 bg-blue flex items-center justify-center text-white font-display text-lg flex-shrink-0">
+              ?
+            </span>
+            <div>
+              <p id="panel-name" class="font-semibold text-ink">—</p>
+              <a id="panel-email" href="#"
+                 class="text-blue text-xs hover:underline transition-colors"></a>
+            </div>
+          </div>
+          <p id="panel-date" class="text-ink/35 text-xs flex-shrink-0 mt-1"></p>
+        </div>
+      </div>
+
+      {# Corps du message #}
+      <div class="px-6 py-6 flex-1">
+        <p id="panel-body" class="text-ink/70 text-sm leading-relaxed whitespace-pre-wrap"></p>
+      </div>
+
+      {# Actions bas de panneau #}
+      <div class="px-6 py-4 border-t border-surface-border flex items-center gap-3">
+
+        {# Répondre par email #}
+        <a id="panel-reply-btn" href="#"
+           class="inline-flex items-center gap-2 bg-blue hover:bg-blue-dark text-white font-semibold text-sm px-5 py-2.5 transition-colors">
+          <i class="fa-solid fa-reply"></i>
+          Répondre par email
+        </a>
+
+        {# Marquer lu/non-lu — soumis en POST classique #}
+        <form id="panel-read-form" method="POST" action="#">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="toggle_read" />
+          <button type="submit"
+                  id="panel-read-btn"
+                  class="inline-flex items-center gap-2 bg-surface-2 hover:bg-surface-border text-ink/60 font-semibold text-sm px-4 py-2.5 transition-colors">
+            <i class="fa-regular fa-envelope"></i>
+            <span id="panel-read-label">Marquer comme lu</span>
+          </button>
+        </form>
+
+        {# Supprimer #}
+        <form id="panel-delete-form" method="POST" action="#">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete" />
+          <button type="submit"
+                  class="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-sm px-4 py-2.5 transition-colors"
+                  onclick="return confirm('Supprimer ce message ?')">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<style>
+  .filter-btn {
+    padding: 5px 12px; font-size: .75rem; font-weight: 600;
+    color: rgba(17,24,39,.45); transition: color .15s, background .15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { color: #111827; background: #F3F4F6; }
+  .filter-btn[data-active="true"] { background: #2563EB; color: #fff; }
+
+  .msg-row.active {
+    background: #EFF6FF;
+    border-left: 2px solid #2563EB;
+  }
+</style>
+
+<script>
+  // ── Compteur non lus ───────────────────────────────
+  var rows    = document.querySelectorAll('.msg-row');
+  var unread  = 0;
+  rows.forEach(function (r) { if (r.getAttribute('data-read') === 'false') unread++; });
+  var unreadEl = document.getElementById('unread-count');
+  if (unreadEl) unreadEl.textContent = unread;
+
+  // ── Filtre côté client ─────────────────────────────
+  var filterParam = new URLSearchParams(window.location.search).get('filter');
+  if (filterParam === 'unread') {
+    rows.forEach(function (r) {
+      if (r.getAttribute('data-read') === 'true') { r.style.display = 'none'; }
+    });
+  } else if (filterParam === 'read') {
+    rows.forEach(function (r) {
+      if (r.getAttribute('data-read') === 'false') { r.style.display = 'none'; }
+    });
+  }
+
+  // ── Ouvrir un message dans le panneau ─────────────
+  function openMessage(btn) {
+    // Retirer état actif des autres
+    rows.forEach(function (r) { r.classList.remove('active'); });
+    btn.classList.add('active');
+
+    // Récupérer les données depuis les data-attributes
+    var id      = btn.getAttribute('data-id');
+    var name    = btn.getAttribute('data-name');
+    var email   = btn.getAttribute('data-email');
+    var date    = btn.getAttribute('data-date');
+    var message = btn.getAttribute('data-message');
+    var isRead  = btn.getAttribute('data-read') === 'true';
+
+    // Remplir le panneau
+    document.getElementById('panel-avatar').textContent  = name.charAt(0).toUpperCase();
+    document.getElementById('panel-name').textContent    = name;
+    document.getElementById('panel-date').textContent    = date;
+
+    var emailEl = document.getElementById('panel-email');
+    emailEl.textContent = email;
+    emailEl.href = 'mailto:' + email;
+
+    document.getElementById('panel-body').textContent = message;
+
+    // Bouton répondre
+    document.getElementById('panel-reply-btn').href = 'mailto:' + email + '?subject=Réponse à votre message – AutoKlik';
+
+    // Bouton lu/non-lu
+    var readLabel = document.getElementById('panel-read-label');
+    var readIcon  = document.querySelector('#panel-read-btn i');
+    if (isRead) {
+      readLabel.textContent = 'Marquer non lu';
+      readIcon.className    = 'fa-solid fa-envelope';
+    } else {
+      readLabel.textContent = 'Marquer comme lu';
+      readIcon.className    = 'fa-regular fa-envelope-open';
+    }
+
+    // URL des forms d'action
+    var toggleUrl = '/dashboard/messages/' + id + '/toggle-read/';
+    var deleteUrl = '/dashboard/messages/' + id + '/delete/';
+    document.getElementById('panel-read-form').action   = toggleUrl;
+    document.getElementById('panel-delete-form').action = deleteUrl;
+
+    // Masquer le point non-lu dans la liste si on ouvre le message
+    var dot = btn.querySelector('.unread-dot');
+    if (dot) { dot.classList.add('invisible'); }
+
+    // Afficher le panneau
+    document.getElementById('panel-empty').classList.add('hidden');
+    document.getElementById('panel-content').classList.remove('hidden');
+    document.getElementById('panel-content').classList.add('flex');
+  }
+</script>
+{% endblock %}
