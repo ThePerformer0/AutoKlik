@@ -2,6 +2,7 @@ import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth.models import User
 from core.models import Service, Appointment, Review, ContactMessage, GarageSettings
 
 class Command(BaseCommand):
@@ -14,6 +15,11 @@ class Command(BaseCommand):
         Review.objects.all().delete()
         ContactMessage.objects.all().delete()
         GarageSettings.objects.all().delete()
+
+        # 0. Superutilisateur par défaut
+        if not User.objects.filter(username='admin').exists():
+            self.stdout.write("Création du compte administrateur par défaut...")
+            User.objects.create_superuser('admin', 'admin@autoklik.cm', 'admin123')
 
         # 1. Paramètres du Garage
         self.stdout.write("Création des paramètres du garage...")
